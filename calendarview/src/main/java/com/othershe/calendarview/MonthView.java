@@ -40,7 +40,7 @@ public class MonthView extends ViewGroup {
             if (data.getType() == 0 || data.getType() == 2) {
                 day.setTextColor(Color.GRAY);
             }
-            day.setText(data.getDay());
+            day.setText(data.getSolar()[2]);
             addViewInLayout(view, i, view.getLayoutParams(), true);
         }
 

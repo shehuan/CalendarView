@@ -41,30 +41,27 @@ public class CalendarUtil {
 
         for (int i = 0; i < week; i++) {
             DateBean dateBean = new DateBean();
-            dateBean.setYear(lastYear);
-            dateBean.setMonth(lastMonth);
-            dateBean.setDay(lastMonthDays - week + 1 + i);
+            dateBean.setSolar(lastYear, lastMonth, lastMonthDays - week + 1 + i);
             dateBean.setHoliday(getHoliday(lastYear, lastMonth, lastMonthDays - week + i));
+            dateBean.setLunar(LunarUtil.solarToLunar(lastYear, lastMonth, lastMonthDays - week + 1 + i));
             dateBean.setType(0);
             datas.add(dateBean);
         }
 
         for (int i = 0; i < currentMonthDays; i++) {
             DateBean dateBean = new DateBean();
-            dateBean.setYear(year);
-            dateBean.setMonth(month);
-            dateBean.setDay(i + 1);
+            dateBean.setSolar(year, month, i + 1);
             dateBean.setHoliday(getHoliday(year, month, i + 1));
+            dateBean.setLunar(LunarUtil.solarToLunar(year, month, i + 1));
             dateBean.setType(1);
             datas.add(dateBean);
         }
 
         for (int i = 0; i < 7 * getMonthRows(year, month) - currentMonthDays - week; i++) {
             DateBean dateBean = new DateBean();
-            dateBean.setYear(nextYear);
-            dateBean.setMonth(nextMonth);
-            dateBean.setDay(i + 1);
+            dateBean.setSolar(nextYear, nextMonth, i + 1);
             dateBean.setHoliday(getHoliday(nextYear, nextMonth, i + 1));
+            dateBean.setLunar(LunarUtil.solarToLunar(nextYear, nextMonth, i + 1));
             dateBean.setType(2);
             datas.add(dateBean);
         }
@@ -187,8 +184,8 @@ public class CalendarUtil {
      * @return
      */
     public static int getMonthRows(int year, int month) {
-        int size = getFirstWeekOfMonth(year, month - 1) + getMonthDays(year, month);
-        return size % 7 == 0 ? size / 7 : (size / 7) + 1;
+        int count = getFirstWeekOfMonth(year, month - 1) + getMonthDays(year, month);
+        return count % 7 == 0 ? count / 7 : (count / 7) + 1;
     }
 
     /**

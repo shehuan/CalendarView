@@ -20,9 +20,14 @@ public class MainActivity extends AppCompatActivity {
         TextView textView = (TextView) findViewById(R.id.text);
         StringBuilder stringBuilder = new StringBuilder();
 
-        List<DateBean> l = CalendarUtil.getMonthDate(2017, 5);
+        List<DateBean> l = CalendarUtil.getMonthDate(2017, 7);
         for (DateBean dateBean : l) {
-            stringBuilder.append(dateBean.getYear() + "-" + dateBean.getMonth() + "-" + dateBean.getDay() + "-" + dateBean.getHoliday() + "\n");
+            stringBuilder.append(dateBean.getSolar()[0] + "-"
+                    + dateBean.getSolar()[1] + "-"
+                    + dateBean.getSolar()[2] + "-"
+                    + dateBean.getHoliday() + "-"
+                    + dateBean.getLunar()[0] + "-"
+                    + dateBean.getLunar()[1] + "\n");
         }
 
         textView.setText(stringBuilder.toString());

@@ -1,43 +1,25 @@
 package com.othershe.calendarview;
 
 public class DateBean {
-    private int year;//年
-    private int month;//月
-    private int day;//日
-    private String lunarDay;//农历
+    private int[] solar;//阳历年、月、日
+    private String[] lunar;//农历月、日
     private String holiday;//节假日
     private int type;//0:上月，1:当月，2:下月
 
-    public int getYear() {
-        return year;
+    public int[] getSolar() {
+        return solar;
     }
 
-    public void setYear(int year) {
-        this.year = year;
+    public void setSolar(int year, int month, int day) {
+        this.solar = new int[]{year, month, day};
     }
 
-    public int getMonth() {
-        return month;
+    public String[] getLunar() {
+        return lunar;
     }
 
-    public void setMonth(int month) {
-        this.month = month;
-    }
-
-    public int getDay() {
-        return day;
-    }
-
-    public void setDay(int day) {
-        this.day = day;
-    }
-
-    public String getLunarDay() {
-        return lunarDay;
-    }
-
-    public void setLunarDay(String lunarDay) {
-        this.lunarDay = lunarDay;
+    public void setLunar(String[] lunar) {
+        this.lunar = lunar;
     }
 
     public String getHoliday() {
