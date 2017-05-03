@@ -21,6 +21,6 @@ public class ExampleInstrumentedTest {
         // Context of the app under test.
         Context appContext = InstrumentationRegistry.getTargetContext();
 
-        assertEquals("com.othershe.calendarview", appContext.getPackageName());
+        assertEquals("com.othershe.calendarview.test", appContext.getPackageName());
     }
 }
