@@ -22,11 +22,7 @@ public class MonthView extends ViewGroup {
     }
 
     public MonthView(Context context, AttributeSet attrs) {
-        this(context, attrs, 0);
-    }
-
-    public MonthView(Context context, AttributeSet attrs, int defStyleAttr) {
-        super(context, attrs, defStyleAttr);
+        super(context, attrs, 0);
         mContext = context;
     }
 
@@ -34,6 +30,7 @@ public class MonthView extends ViewGroup {
         if (getChildCount() > 0) {
             removeAllViews();
         }
+
         for (int i = 0; i < datas.size(); i++) {
             View view = LayoutInflater.from(mContext).inflate(R.layout.item_month_layout, null);
             final DateBean data = datas.get(i);

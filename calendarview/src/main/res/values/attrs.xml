@@ -1,7 +1,34 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <declare-styleable name="CalendarView">
-
+        <!--是否多选-->
+        <attr name="multi_choose" format="boolean" />
+        <!--是否显示农历-->
+        <attr name="show_lunar" format="boolean" />
+        <!--是否显示上月和下月-->
+        <attr name="show_last_next" format="boolean" />
+        <!--开始日期(xxxx.x)-->
+        <attr name="start_date" format="string" />
+        <!--结束日期(xxxx.x)-->
+        <attr name="end_date" format="string" />
+        <!--当前日期(xxxx.x.x)-->
+        <attr name="current_date" format="string" />
+        <!--阳历的日期颜色-->
+        <attr name="solar_color" format="color" />
+        <!--阳历的日期大小-->
+        <attr name="solar_size" format="dimension" />
+        <!--农历的日期颜色-->
+        <attr name="lunar_color" format="color" />
+        <!--农历的日期大小-->
+        <attr name="lunar_size" format="dimension" />
+        <!--选中的日期颜色-->
+        <attr name="choose_color" format="color" />
+        <!--日期背景-->
+        <attr name="item_bg" format="reference" />
+        <!--周的文字颜色-->
+        <attr name="week_color" format="color" />
+        <!--周的文字大小-->
+        <attr name="week_size" format="dimension" />
     </declare-styleable>
 
 </resources>

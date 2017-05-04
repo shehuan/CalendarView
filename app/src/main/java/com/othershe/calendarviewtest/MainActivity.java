@@ -41,6 +41,8 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        calendarView.setOnCalendarViewAdapter(10, null);
+
     }
 
     public void today(View view) {

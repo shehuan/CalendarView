@@ -4,7 +4,9 @@ import android.content.Context;
 import android.support.v4.view.ViewPager;
 import android.util.AttributeSet;
 
+import com.othershe.calendarview.listener.CalendarViewAdapter;
 import com.othershe.calendarview.listener.OnItemClickListener;
+import com.othershe.calendarview.listener.OnMultiChooseListener;
 import com.othershe.calendarview.listener.OnPagerChangeListener;
 import com.othershe.calendarview.utils.CalendarUtil;
 
@@ -14,6 +16,9 @@ public class CalendarView extends ViewPager {
 
     private OnPagerChangeListener pagerChangeListener;
     private OnItemClickListener itemClickListener;
+    private OnMultiChooseListener multiChooseListener;
+    private CalendarViewAdapter calendarViewAdapter;
+    private int item_layout;
 
     public CalendarView(Context context) {
         this(context, null);
@@ -21,7 +26,7 @@ public class CalendarView extends ViewPager {
 
     public CalendarView(Context context, AttributeSet attrs) {
         super(context, attrs);
-        setAdapter(new CalendarPagerAdapter(null));
+        setAdapter(new CalendarPagerAdapter(attrs));
 
         currentPosition = CalendarUtil.dateToPosition(CalendarUtil.getCurrentDate()[0], CalendarUtil.getCurrentDate()[1]);
         setCurrentItem(currentPosition, false);
@@ -37,6 +42,7 @@ public class CalendarView extends ViewPager {
             }
         });
     }
+
 
     /**
      * 计算 ViewPager 高度
@@ -59,6 +65,19 @@ public class CalendarView extends ViewPager {
     }
 
     /**
+     * 设置多选回调
+     *
+     * @param multiChooseListener
+     */
+    public void setOnMultiChooseListener(OnMultiChooseListener multiChooseListener) {
+        this.multiChooseListener = multiChooseListener;
+    }
+
+    public OnMultiChooseListener getMultiChooseListener() {
+        return multiChooseListener;
+    }
+
+    /**
      * 设置日期点击回调
      *
      * @param itemClickListener
@@ -78,6 +97,11 @@ public class CalendarView extends ViewPager {
      */
     public void setOnPagerChangeListener(OnPagerChangeListener pagerChangeListener) {
         this.pagerChangeListener = pagerChangeListener;
+    }
+
+    public void setOnCalendarViewAdapter(int item_layout, CalendarViewAdapter calendarViewAdapter) {
+        this.item_layout = item_layout;
+        this.calendarViewAdapter = calendarViewAdapter;
     }
 
     /**
