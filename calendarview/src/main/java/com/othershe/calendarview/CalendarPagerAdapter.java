@@ -7,11 +7,13 @@ import android.view.ViewGroup;
 
 import com.othershe.calendarview.utils.CalendarUtil;
 
+import java.util.LinkedList;
+
 public class CalendarPagerAdapter extends PagerAdapter {
 
     private AttributeSet attrs;
     //缓存上一次回收的MonthView
-    private MonthView cacheView;
+    private LinkedList<MonthView> cache = new LinkedList<>();
 
     public CalendarPagerAdapter(AttributeSet attrs) {
         this.attrs = attrs;
@@ -30,8 +32,8 @@ public class CalendarPagerAdapter extends PagerAdapter {
     @Override
     public Object instantiateItem(ViewGroup container, int position) {
         MonthView view;
-        if (cacheView != null) {
-            view = cacheView;
+        if (!cache.isEmpty()) {
+            view = cache.removeFirst();
         } else {
             view = new MonthView(container.getContext(), attrs);
         }
@@ -47,6 +49,6 @@ public class CalendarPagerAdapter extends PagerAdapter {
     @Override
     public void destroyItem(ViewGroup container, int position, Object object) {
         container.removeView((View) object);
-        cacheView = (MonthView) object;
+        cache.addLast((MonthView) object);
     }
 }
