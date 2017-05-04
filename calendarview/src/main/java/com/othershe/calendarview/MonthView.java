@@ -28,20 +28,39 @@ public class MonthView extends ViewGroup {
     public MonthView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         mContext = context;
-        setWillNotDraw(false);
     }
 
-    public void setDatas(List<DateBean> datas) {
-        View view = LayoutInflater.from(mContext).inflate(R.layout.item_month_layout, this, false);
-
+    public void setDateList(List<DateBean> datas) {
+        if (getChildCount() > 0) {
+            removeAllViews();
+        }
         for (int i = 0; i < datas.size(); i++) {
-            DateBean data = datas.get(i);
+            View view = LayoutInflater.from(mContext).inflate(R.layout.item_month_layout, null);
+            final DateBean data = datas.get(i);
             TextView day = (TextView) view.findViewById(R.id.day);
+            TextView lunarDay = (TextView) view.findViewById(R.id.lunar_day);
             if (data.getType() == 0 || data.getType() == 2) {
                 day.setTextColor(Color.GRAY);
             }
-            day.setText(data.getSolar()[2]);
-            addViewInLayout(view, i, view.getLayoutParams(), true);
+            day.setText(String.valueOf(data.getSolar()[2]));
+
+            if ("初一".equals(data.getLunar()[1])) {
+                lunarDay.setText(data.getLunar()[0]);
+            } else {
+                lunarDay.setText(data.getLunar()[1]);
+            }
+
+            view.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (getParent() instanceof CalendarView) {
+                        CalendarView calendarView = (CalendarView) getParent();
+                        calendarView.getItemClickListener().onItemClick(data);
+                    }
+                }
+            });
+
+            addView(view);
         }
 
         requestLayout();
@@ -51,20 +70,35 @@ public class MonthView extends ViewGroup {
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
 
-        measureChildren(widthMeasureSpec, heightMeasureSpec);
-
         int widthSpecSize = MeasureSpec.getSize(widthMeasureSpec);
 
-        int itemWidth = widthMeasureSpec / COLUMN;
+        int itemWidth = widthSpecSize / COLUMN;
 
         int width = widthSpecSize;
         int height = itemWidth * ROW;
 
         setMeasuredDimension(width, height);
+
+        int itemHeight;
+
+        if (getChildCount() == 35) {
+            itemHeight = getMeasuredHeight() / 5;
+        } else {
+            itemHeight = itemWidth;
+        }
+
+        for (int i = 0; i < getChildCount(); i++) {
+            View childView = getChildAt(i);
+            childView.measure(MeasureSpec.makeMeasureSpec(itemWidth, MeasureSpec.EXACTLY), MeasureSpec.makeMeasureSpec(itemHeight, MeasureSpec.EXACTLY));
+        }
     }
 
     @Override
     protected void onLayout(boolean changed, int l, int t, int r, int b) {
+        if (getChildCount() == 0) {
+            return;
+        }
+
         View childView = getChildAt(0);
         int itemWidth = childView.getMeasuredWidth();
         int itemHeight = childView.getMeasuredHeight();

@@ -1,4 +1,6 @@
-package com.othershe.calendarview;
+package com.othershe.calendarview.utils;
+
+import com.othershe.calendarview.DateBean;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -40,45 +42,43 @@ public class CalendarUtil {
         }
 
         for (int i = 0; i < week; i++) {
-            DateBean dateBean = new DateBean();
-            dateBean.setSolar(lastYear, lastMonth, lastMonthDays - week + 1 + i);
-            dateBean.setHoliday(getHoliday(lastYear, lastMonth, lastMonthDays - week + i));
-            dateBean.setLunar(LunarUtil.solarToLunar(lastYear, lastMonth, lastMonthDays - week + 1 + i));
-            dateBean.setType(0);
-            datas.add(dateBean);
+            datas.add(initDateBean(lastYear, lastMonth, lastMonthDays - week + 1 + i, 0));
         }
 
         for (int i = 0; i < currentMonthDays; i++) {
-            DateBean dateBean = new DateBean();
-            dateBean.setSolar(year, month, i + 1);
-            dateBean.setHoliday(getHoliday(year, month, i + 1));
-            dateBean.setLunar(LunarUtil.solarToLunar(year, month, i + 1));
-            dateBean.setType(1);
-            datas.add(dateBean);
+            datas.add(initDateBean(year, month, i + 1, 1));
         }
 
         for (int i = 0; i < 7 * getMonthRows(year, month) - currentMonthDays - week; i++) {
-            DateBean dateBean = new DateBean();
-            dateBean.setSolar(nextYear, nextMonth, i + 1);
-            dateBean.setHoliday(getHoliday(nextYear, nextMonth, i + 1));
-            dateBean.setLunar(LunarUtil.solarToLunar(nextYear, nextMonth, i + 1));
-            dateBean.setType(2);
-            datas.add(dateBean);
+            datas.add(initDateBean(nextYear, nextMonth, i + 1, 2));
         }
 
         return datas;
+    }
+
+    private static DateBean initDateBean(int year, int month, int day, int type) {
+        DateBean dateBean = new DateBean();
+        dateBean.setSolar(year, month, day);
+        dateBean.setLunar(LunarUtil.solarToLunar(year, month, day));
+        dateBean.setType(type);
+
+        if (type == 0) {
+            dateBean.setHoliday(getHoliday(month, day - 1));
+        } else {
+            dateBean.setHoliday(getHoliday(month, day));
+        }
+        return dateBean;
     }
 
 
     /**
      * 获取国家法定节假日
      *
-     * @param year
      * @param month
      * @param day
      * @return
      */
-    public static String getHoliday(int year, int month, int day) {
+    public static String getHoliday(int month, int day) {
         String message = "";
         if (month == 1 && day == 1) {
             message = "元旦";
@@ -88,22 +88,8 @@ public class CalendarUtil {
             message = "妇女节";
         } else if (month == 3 && day == 12) {
             message = "植树节";
-        } else if (month == 4) {
-            if (day == 1) {
-                message = "愚人节";
-            } else if (day >= 4 && day <= 6) {
-                if (year <= 1999) {
-                    int compare = (int) (((year - 1900) * 0.2422 + 5.59) - ((year - 1900) / 4));
-                    if (compare == day) {
-                        message = "清明节";
-                    }
-                } else {
-                    int compare = (int) (((year - 2000) * 0.2422 + 4.81) - ((year - 2000) / 4));
-                    if (compare == day) {
-                        message = "清明节";
-                    }
-                }
-            }
+        } else if (month == 4 && day == 1) {
+            message = "愚人节";
         } else if (month == 5 && day == 1) {
             message = "劳动节";
         } else if (month == 5 && day == 4) {
@@ -196,5 +182,27 @@ public class CalendarUtil {
     public static int[] getCurrentDate() {
         Calendar calendar = Calendar.getInstance();
         return new int[]{calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH) + 1, calendar.get(Calendar.DAY_OF_MONTH)};
+    }
+
+    /**
+     * 根据ViewPager position 得到对应年月
+     *
+     * @param position
+     * @return
+     */
+    public static int[] positionToDate(int position) {
+        int year = position / 12 + 1900;
+        int month = position % 12;
+
+        if (position % 12 == 0) {
+            year -= 1;
+            month = 12;
+        }
+
+        return new int[]{year, month};
+    }
+
+    public static int dateToPosition(int year, int month) {
+        return (year - 1900) * 12 + month;
     }
 }

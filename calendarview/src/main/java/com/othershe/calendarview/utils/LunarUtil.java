@@ -1,4 +1,4 @@
-package com.othershe.calendarview;
+package com.othershe.calendarview.utils;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
