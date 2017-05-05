@@ -2,6 +2,7 @@ package com.othershe.calendarview;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,6 +17,8 @@ public class MonthView extends ViewGroup {
     private static final int COLUMN = 7;
 
     private Context mContext;
+
+    private View last;
 
     public MonthView(Context context) {
         this(context, null);
@@ -37,27 +40,40 @@ public class MonthView extends ViewGroup {
             TextView day = (TextView) view.findViewById(R.id.day);
             TextView lunarDay = (TextView) view.findViewById(R.id.lunar_day);
             if (data.getType() == 0 || data.getType() == 2) {
-                day.setTextColor(Color.GRAY);
+                day.setTextColor(Color.parseColor("#8A000000"));
             }
             day.setText(String.valueOf(data.getSolar()[2]));
 
             if ("初一".equals(data.getLunar()[1])) {
                 lunarDay.setText(data.getLunar()[0]);
             } else {
-                lunarDay.setText(data.getLunar()[1]);
+                if (!TextUtils.isEmpty(data.getHoliday())) {
+                    lunarDay.setText(data.getHoliday());
+                } else {
+                    lunarDay.setText(data.getLunar()[1]);
+                }
             }
-
             view.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if (getParent() instanceof CalendarView) {
-                        CalendarView calendarView = (CalendarView) getParent();
+                    CalendarView calendarView = (CalendarView) getParent();
+                    if (data.getType() == 1) {//点击当月
+                        if (last != null) {
+                            last.setBackgroundResource(0);
+                        }
+                        v.setBackgroundResource(R.drawable.circle);
                         calendarView.getItemClickListener().onItemClick(data);
+                        last = v;
+                    } else if (data.getType() == 0) {//点击上月
+                        calendarView.lastMonth();
+
+                    } else if (data.getType() == 2) {//点击下月
+                        calendarView.nextMonth();
                     }
                 }
             });
 
-            addView(view);
+            addView(view, i);
         }
 
         requestLayout();
@@ -69,7 +85,7 @@ public class MonthView extends ViewGroup {
 
         int widthSpecSize = MeasureSpec.getSize(widthMeasureSpec);
 
-        int itemWidth = widthSpecSize / COLUMN;
+        int itemWidth = widthSpecSize / COLUMN - 14;
 
         int width = widthSpecSize;
         int height = itemWidth * ROW;
@@ -78,11 +94,11 @@ public class MonthView extends ViewGroup {
 
         int itemHeight;
 
-        if (getChildCount() == 35) {
-            itemHeight = getMeasuredHeight() / 5;
-        } else {
-            itemHeight = itemWidth;
-        }
+//        if (getChildCount() == 35) {
+//            itemHeight = getMeasuredHeight() / 5;
+//        } else {
+        itemHeight = itemWidth;
+//        }
 
         for (int i = 0; i < getChildCount(); i++) {
             View childView = getChildAt(i);
@@ -100,10 +116,17 @@ public class MonthView extends ViewGroup {
         int itemWidth = childView.getMeasuredWidth();
         int itemHeight = childView.getMeasuredHeight();
 
+
+        int dy = 0;
+        if (getChildCount() == 35) {
+            dy = itemWidth / 5;
+        }
+
         for (int i = 0; i < getChildCount(); i++) {
             View view = getChildAt(i);
-            int left = i % COLUMN * itemWidth;
-            int top = i / COLUMN * itemHeight;
+
+            int left = i % COLUMN * itemWidth + (2 * (i % COLUMN) + 1) * 7;
+            int top = i / COLUMN * (itemHeight + dy);
             int right = left + itemWidth;
             int bottom = top + itemHeight;
             view.layout(left, top, right, bottom);

@@ -170,8 +170,12 @@ public class CalendarUtil {
      * @return
      */
     public static int getMonthRows(int year, int month) {
-        int count = getFirstWeekOfMonth(year, month - 1) + getMonthDays(year, month);
-        return count % 7 == 0 ? count / 7 : (count / 7) + 1;
+        int items = getFirstWeekOfMonth(year, month - 1) + getMonthDays(year, month);
+        int rows = items % 7 == 0 ? items / 7 : (items / 7) + 1;
+        if (rows == 4) {
+            rows = 5;
+        }
+        return rows;
     }
 
     /**
