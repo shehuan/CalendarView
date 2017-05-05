@@ -37,11 +37,14 @@
 
     </RelativeLayout>
 
+    <com.othershe.calendarview.WeekView
+        android:layout_width="match_parent"
+        android:layout_height="40dp" />
+
     <com.othershe.calendarview.CalendarView
         android:id="@+id/calendar"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="15dp" />
+        android:layout_height="wrap_content" />
 
     <RelativeLayout
         android:layout_width="match_parent"

@@ -20,7 +20,7 @@ public class MonthView extends ViewGroup {
 
     private Context mContext;
 
-    private View last;
+    private View lastClickedView;
 
     public MonthView(Context context) {
         this(context, null);
@@ -38,9 +38,19 @@ public class MonthView extends ViewGroup {
         }
         int[] today = SolarUtil.getCurrentDate();
 
+        boolean showLastNext = true;
+
         for (int i = 0; i < datas.size(); i++) {
-            View view = LayoutInflater.from(mContext).inflate(R.layout.item_month_layout, null);
             final DateBean date = datas.get(i);
+
+            if (!showLastNext) {
+                if (date.getType() == 0 || date.getType() == 2) {
+                    addView(new View(mContext), i);
+                    continue;
+                }
+            }
+
+            View view = LayoutInflater.from(mContext).inflate(R.layout.item_month_layout, null);
             TextView day = (TextView) view.findViewById(R.id.day);
             final TextView lunarDay = (TextView) view.findViewById(R.id.lunar_day);
             if (date.getType() == 0 || date.getType() == 2) {
@@ -74,7 +84,7 @@ public class MonthView extends ViewGroup {
             //默认选中当天
             if (today[0] == date.getSolar()[0] && today[1] == date.getSolar()[1] && today[2] == date.getSolar()[2]) {
                 view.setBackgroundResource(R.drawable.blue_circle);
-                last = view;
+                lastClickedView = view;
                 setTextColor(view, 1);
             }
 
@@ -83,14 +93,14 @@ public class MonthView extends ViewGroup {
                 public void onClick(View v) {
                     CalendarView calendarView = (CalendarView) getParent();
                     if (date.getType() == 1) {//点击当月
-                        if (last != null) {
-                            last.setBackgroundResource(0);
-                            setTextColor(last, 0);
+                        if (lastClickedView != null) {
+                            lastClickedView.setBackgroundResource(0);
+                            setTextColor(lastClickedView, 0);
                         }
                         v.setBackgroundResource(R.drawable.blue_circle);
                         setTextColor(v, 1);
                         calendarView.getItemClickListener().onItemClick(date);
-                        last = v;
+                        lastClickedView = v;
                     } else if (date.getType() == 0) {//点击上月
                         calendarView.lastMonth();
 
