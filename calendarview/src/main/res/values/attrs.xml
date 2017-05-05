@@ -25,6 +25,8 @@
         <attr name="choose_color" format="color" />
         <!--节日文字颜色-->
         <attr name="holiday_color" format="color" />
+        <!--是否显示节假日-->
+        <attr name="show_holiday" format="boolean" />
         <!--日期背景-->
         <attr name="item_bg" format="reference" />
         <!--周的文字颜色-->

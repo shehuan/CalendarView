@@ -3,7 +3,6 @@ package com.othershe.calendarview.utils;
 import com.othershe.calendarview.DateBean;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
 
 public class CalendarUtil {
@@ -16,7 +15,7 @@ public class CalendarUtil {
      */
     public static List<DateBean> getMonthDate(int year, int month) {
         List<DateBean> datas = new ArrayList<>();
-        int week = getFirstWeekOfMonth(year, month - 1);
+        int week = SolarUtil.getFirstWeekOfMonth(year, month - 1);
 
         int lastYear;
         int lastMonth;
@@ -27,9 +26,9 @@ public class CalendarUtil {
             lastMonth = month - 1;
             lastYear = year;
         }
-        int lastMonthDays = getMonthDays(lastYear, lastMonth);//上个月总天数
+        int lastMonthDays = SolarUtil.getMonthDays(lastYear, lastMonth);//上个月总天数
 
-        int currentMonthDays = getMonthDays(year, month);//当前月总天数
+        int currentMonthDays = SolarUtil.getMonthDays(year, month);//当前月总天数
 
         int nextYear;
         int nextMonth;
@@ -59,107 +58,20 @@ public class CalendarUtil {
     private static DateBean initDateBean(int year, int month, int day, int type) {
         DateBean dateBean = new DateBean();
         dateBean.setSolar(year, month, day);
-        dateBean.setLunar(LunarUtil.solarToLunar(year, month, day));
+
+        String[] temp = LunarUtil.solarToLunar(year, month, day);
+
+        dateBean.setLunar(new String[]{temp[0], temp[1]});
         dateBean.setType(type);
+        dateBean.setTerm(LunarUtil.getTermString(year, month - 1, day));
+        dateBean.setLunarHoliday(temp[2]);
 
         if (type == 0) {
-            dateBean.setHoliday(getHoliday(month, day - 1));
+            dateBean.setSolarHoliday(SolarUtil.getSolarHoliday(year, month, day - 1));
         } else {
-            dateBean.setHoliday(getHoliday(month, day));
+            dateBean.setSolarHoliday(SolarUtil.getSolarHoliday(year, month, day));
         }
         return dateBean;
-    }
-
-
-    /**
-     * 获取国家法定节假日
-     *
-     * @param month
-     * @param day
-     * @return
-     */
-    public static String getHoliday(int month, int day) {
-        String message = "";
-        if (month == 1 && day == 1) {
-            message = "元旦";
-        } else if (month == 2 && day == 14) {
-            message = "情人节";
-        } else if (month == 3 && day == 8) {
-            message = "妇女节";
-        } else if (month == 3 && day == 12) {
-            message = "植树节";
-        } else if (month == 4 && day == 1) {
-            message = "愚人节";
-        } else if (month == 5 && day == 1) {
-            message = "劳动节";
-        } else if (month == 5 && day == 4) {
-            message = "青年节";
-        } else if (month == 5 && day == 12) {
-            message = "护士节";
-        } else if (month == 6 && day == 1) {
-            message = "儿童节";
-        } else if (month == 7 && day == 1) {
-            message = "建党节";
-        } else if (month == 8 && day == 1) {
-            message = "建军节";
-        } else if (month == 9 && day == 10) {
-            message = "教师节";
-        } else if (month == 10 && day == 1) {
-            message = "国庆节";
-        } else if (month == 11 && day == 11) {
-            message = "光棍节";
-        } else if (month == 12 && day == 24) {
-            message = "平安夜";
-        } else if (month == 12 && day == 25) {
-            message = "圣诞节";
-        }
-        return message;
-    }
-
-    /**
-     * 计算当月1号是周几
-     *
-     * @param year
-     * @param month
-     * @return
-     */
-    public static int getFirstWeekOfMonth(int year, int month) {
-        Calendar calendar = Calendar.getInstance();
-        calendar.set(year, month, 1);
-        return calendar.get(Calendar.DAY_OF_WEEK) - 1;
-    }
-
-    /**
-     * 计算指定月份的天数
-     *
-     * @param year
-     * @param month
-     * @return
-     */
-    public static int getMonthDays(int year, int month) {
-        switch (month) {
-            case 1:
-            case 3:
-            case 5:
-            case 7:
-            case 8:
-            case 10:
-            case 12:
-                return 31;
-            case 4:
-            case 6:
-            case 9:
-            case 11:
-                return 30;
-            case 2:
-                if (((year % 4 == 0) && (year % 100 != 0)) || (year % 400 == 0)) {
-                    return 29;
-                } else {
-                    return 28;
-                }
-            default:
-                return -1;
-        }
     }
 
     /**
@@ -170,22 +82,12 @@ public class CalendarUtil {
      * @return
      */
     public static int getMonthRows(int year, int month) {
-        int items = getFirstWeekOfMonth(year, month - 1) + getMonthDays(year, month);
+        int items = SolarUtil.getFirstWeekOfMonth(year, month - 1) + SolarUtil.getMonthDays(year, month);
         int rows = items % 7 == 0 ? items / 7 : (items / 7) + 1;
         if (rows == 4) {
             rows = 5;
         }
         return rows;
-    }
-
-    /**
-     * 计算当前日期
-     *
-     * @return
-     */
-    public static int[] getCurrentDate() {
-        Calendar calendar = Calendar.getInstance();
-        return new int[]{calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH) + 1, calendar.get(Calendar.DAY_OF_MONTH)};
     }
 
     /**

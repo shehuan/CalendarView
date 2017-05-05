@@ -3,8 +3,10 @@ package com.othershe.calendarview;
 public class DateBean {
     private int[] solar;//阳历年、月、日
     private String[] lunar;//农历月、日
-    private String holiday;//节假日
+    private String solarHoliday;//阳历节假日
+    private String lunarHoliday;//阳历节假日
     private int type;//0:上月，1:当月，2:下月
+    private String term;//节气
 
     public int[] getSolar() {
         return solar;
@@ -22,12 +24,20 @@ public class DateBean {
         this.lunar = lunar;
     }
 
-    public String getHoliday() {
-        return holiday;
+    public String getSolarHoliday() {
+        return solarHoliday;
     }
 
-    public void setHoliday(String holiday) {
-        this.holiday = holiday;
+    public void setSolarHoliday(String solarHoliday) {
+        this.solarHoliday = solarHoliday;
+    }
+
+    public String getLunarHoliday() {
+        return lunarHoliday;
+    }
+
+    public void setLunarHoliday(String lunarHoliday) {
+        this.lunarHoliday = lunarHoliday;
     }
 
     public int getType() {
@@ -36,5 +46,13 @@ public class DateBean {
 
     public void setType(int type) {
         this.type = type;
+    }
+
+    public String getTerm() {
+        return term;
+    }
+
+    public void setTerm(String term) {
+        this.term = term;
     }
 }

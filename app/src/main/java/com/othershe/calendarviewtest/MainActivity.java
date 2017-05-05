@@ -5,11 +5,11 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
 
-import com.othershe.calendarview.utils.CalendarUtil;
 import com.othershe.calendarview.CalendarView;
 import com.othershe.calendarview.DateBean;
 import com.othershe.calendarview.listener.OnItemClickListener;
 import com.othershe.calendarview.listener.OnPagerChangeListener;
+import com.othershe.calendarview.utils.SolarUtil;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -23,9 +23,9 @@ public class MainActivity extends AppCompatActivity {
         final TextView title = (TextView) findViewById(R.id.title);
         calendarView = (CalendarView) findViewById(R.id.calendar);
 
-        title.setText(CalendarUtil.getCurrentDate()[0] + "年"
-                + CalendarUtil.getCurrentDate()[1] + "月"
-                + CalendarUtil.getCurrentDate()[2] + "日");
+        title.setText(SolarUtil.getCurrentDate()[0] + "年"
+                + SolarUtil.getCurrentDate()[1] + "月"
+                + SolarUtil.getCurrentDate()[2] + "日");
 
         calendarView.setOnPagerChangeListener(new OnPagerChangeListener() {
             @Override
@@ -55,5 +55,13 @@ public class MainActivity extends AppCompatActivity {
 
     public void nextMonth(View view) {
         calendarView.nextMonth();
+    }
+
+    public void start(View view) {
+        calendarView.toSpecifyDate(1900, 1, 1);
+    }
+
+    public void end(View view) {
+        calendarView.toSpecifyDate(2049, 12, 1);
     }
 }

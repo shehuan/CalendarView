@@ -9,6 +9,7 @@ import com.othershe.calendarview.listener.OnItemClickListener;
 import com.othershe.calendarview.listener.OnMultiChooseListener;
 import com.othershe.calendarview.listener.OnPagerChangeListener;
 import com.othershe.calendarview.utils.CalendarUtil;
+import com.othershe.calendarview.utils.SolarUtil;
 
 public class CalendarView extends ViewPager {
     //记录当前PagerAdapter的position
@@ -28,7 +29,7 @@ public class CalendarView extends ViewPager {
         super(context, attrs);
         setAdapter(new CalendarPagerAdapter(attrs));
 
-        currentPosition = CalendarUtil.dateToPosition(CalendarUtil.getCurrentDate()[0], CalendarUtil.getCurrentDate()[1]);
+        currentPosition = CalendarUtil.dateToPosition(SolarUtil.getCurrentDate()[0], SolarUtil.getCurrentDate()[1]);
         setCurrentItem(currentPosition, false);
         getAdapter().notifyDataSetChanged();
 
@@ -108,7 +109,7 @@ public class CalendarView extends ViewPager {
      * 跳转到今天
      */
     public void today() {
-        setCurrentItem(CalendarUtil.dateToPosition(CalendarUtil.getCurrentDate()[0], CalendarUtil.getCurrentDate()[1]), false);
+        setCurrentItem(CalendarUtil.dateToPosition(SolarUtil.getCurrentDate()[0], SolarUtil.getCurrentDate()[1]), false);
     }
 
     /**

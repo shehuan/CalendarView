@@ -4,10 +4,12 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.TimeZone;
 
 public class LunarUtil {
     //1900-2049
-    private final static int[] LUNAR_INFO = {
+    private static final int[] LUNAR_INFO = {
             0x04bd8, 0x04ae0, 0x0a570, 0x054d5, 0x0d260, 0x0d950, 0x16554, 0x056a0, 0x09ad0, 0x055d2,
             0x04ae0, 0x0a5b6, 0x0a4d0, 0x0d250, 0x1d255, 0x0b540, 0x0d6a0, 0x0ada2, 0x095b0, 0x14977,
             0x04970, 0x0a4b0, 0x0b4b5, 0x06a50, 0x06d40, 0x1ab54, 0x02b60, 0x09570, 0x052f2, 0x04970,
@@ -24,6 +26,21 @@ public class LunarUtil {
             0x05aa0, 0x076a3, 0x096d0, 0x04bd7, 0x04ad0, 0x0a4d0, 0x1d0b6, 0x0d250, 0x0d520, 0x0dd45,
             0x0b5a0, 0x056d0, 0x055b2, 0x049b0, 0x0a577, 0x0a4b0, 0x0aa50, 0x1b255, 0x06d20, 0x0ada0
     };
+
+    private static final int[] solarTermInfo = {
+            0, 21208, 42467, 63836, 85337, 107014, 128867, 150921,
+            173149, 195551, 218072, 240693, 263343, 285989, 308563, 331033,
+            353350, 375494, 397447, 419210, 440795, 462224, 483532, 504758
+    };
+
+    private static final String[] solarTerm = {
+            "小寒", "大寒", "立春", "雨水", "惊蛰", "春分", "清明", "谷雨", "立夏", "小满", "芒种", "夏至",
+            "小暑", "大暑", "立秋", "处暑", "白露", "秋分", "寒露", "霜降", "立冬", "小雪", "大雪", "冬至"};
+
+    private static final String[] monthInfo = new String[]{"", "正月", "二月", "三月", "四月", "五月",
+            "六月", "七月", "八月", "九月", "十月", "冬月", "腊月"};
+
+    private static final String[] dayInfo = new String[]{"", "一", "二", "三", "四", "五", "六", "七", "八", "九"};
 
     // 允许输入的最小年份
     private final static int MIN_YEAR = 1900;
@@ -116,11 +133,11 @@ public class LunarUtil {
         lunarMonth = i;
         lunarDay = offset;
         return new String[]{(leapMonthFlag & (lunarMonth == leapMonth) ? "闰" : "") + getLunarMonth(lunarMonth),
-                getLunarDay(lunarDay)};
+                getLunarDay(lunarDay), getLunarHoliday(lunarYear, lunarMonth, lunarDay)};
     }
 
     /**
-     * 计算阴历{@code lunarYeay}年{@code month}月的天数
+     * 计算阴历年 月的天数
      *
      * @param lunarYear 阴历年
      * @param month     阴历月
@@ -224,8 +241,7 @@ public class LunarUtil {
     }
 
     private static String getLunarMonth(int month) {
-        String[] monthStrs = new String[]{"", "正月", "二月", "三月", "四月", "五月", "六月", "七月", "八月", "九月", "十月", "冬月", "腊月"};
-        return monthStrs[month];
+        return monthInfo[month];
     }
 
     private static String getLunarDay(int day) {
@@ -236,7 +252,7 @@ public class LunarUtil {
         } else if (day == 30) {
             return "三十";
         }
-        String[] dayStrs = new String[]{"", "一", "二", "三", "四", "五", "六", "七", "八", "九"};
+
         String str1 = "";
         int d1 = day / 10;
         if (d1 == 0) {
@@ -246,8 +262,109 @@ public class LunarUtil {
         } else if (d1 == 2) {
             str1 = "廿";
         } else if (d1 == 3) {
-            str1 = "三";
+            str1 = "卅";
         }
-        return str1 + dayStrs[day % 10];
+        return str1 + dayInfo[day % 10];
     }
+
+    /**
+     * 计算农历节日
+     *
+     * @param year
+     * @param month
+     * @param day
+     * @return
+     */
+    private static String getLunarHoliday(int year, int month, int day) {
+
+
+        String holiday = "";
+        if (month == 1 && day == 1) {
+            holiday = "春节";
+        } else if (month == 1 && day == 15) {
+            holiday = "元宵节";
+        } else if (month == 2 && day == 2) {
+            holiday = "龙抬头";
+        } else if (month == 5 && day == 5) {
+            holiday = "端午节";
+        } else if (month == 7 && day == 7) {
+            holiday = "七夕";
+        } else if (month == 8 && day == 15) {
+            holiday = "中秋节";
+        } else if (month == 9 && day == 9) {
+            holiday = "重阳节";
+        } else if (month == 12 && day == 8) {
+            holiday = "腊八";
+        } else if (month == 12 && day == 23) {
+            holiday = "小年";
+        } else {
+            if (month == 12) {
+                if ((((daysInLunarMonth(year, month) == 29) && day == 29))
+                        || ((((daysInLunarMonth(year, month) == 30) && day == 30)))) {
+                    holiday = "除夕";
+                }
+            }
+        }
+        return holiday;
+    }
+
+    public static int daysInLunarMonth(int year, int month) {
+        if ((LUNAR_INFO[year - MIN_YEAR] & (0x100000 >> month)) == 0)
+            return 29;
+        else
+            return 30;
+    }
+
+    private static GregorianCalendar utcCal = null;
+
+    /**
+     * 根据阳历日期计算24节气
+     */
+    public static String getTermString(int solarYear, int solarMonth, int solarDay) {
+
+
+        String termString = "";
+        if (getSolarTermDay(solarYear, solarMonth * 2) == solarDay) {
+            termString = solarTerm[solarMonth * 2];
+        } else if (getSolarTermDay(solarYear, solarMonth * 2 + 1) == solarDay) {
+            termString = solarTerm[solarMonth * 2 + 1];
+        }
+        return termString;
+    }
+
+    private static int getSolarTermDay(int solarYear, int index) {
+        return getUTCDay(getSolarTermCalendar(solarYear, index));
+    }
+
+    private static Date getSolarTermCalendar(int solarYear, int index) {
+        long l = (long) 31556925974.7 * (solarYear - 1900)
+                + solarTermInfo[index] * 60000L;
+        l = l + UTC(1900, 0, 6, 2, 5, 0);
+        return new Date(l);
+    }
+
+    private static synchronized int getUTCDay(Date date) {
+        makeUTCCalendar();
+        synchronized (utcCal) {
+            utcCal.clear();
+            utcCal.setTimeInMillis(date.getTime());
+            return utcCal.get(java.util.Calendar.DAY_OF_MONTH);
+        }
+    }
+
+    private static void makeUTCCalendar() {
+        if (utcCal == null) {
+            utcCal = new GregorianCalendar(TimeZone.getTimeZone("UTC"));
+        }
+    }
+
+    private static synchronized long UTC(int y, int m, int d, int h, int min, int sec) {
+        makeUTCCalendar();
+        synchronized (utcCal) {
+            utcCal.clear();
+            utcCal.set(y, m, d, h, min, sec);
+            return utcCal.getTimeInMillis();
+        }
+    }
+    /**计算24节气结束*/
 }
