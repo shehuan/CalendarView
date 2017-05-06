@@ -2,6 +2,7 @@ package com.othershe.calendarview;
 
 import android.support.v4.view.PagerAdapter;
 import android.util.AttributeSet;
+import android.util.SparseArray;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -14,14 +15,20 @@ public class CalendarPagerAdapter extends PagerAdapter {
     private AttributeSet attrs;
     //缓存上一次回收的MonthView
     private LinkedList<MonthView> cache = new LinkedList<>();
+    private SparseArray<MonthView> mViews = new SparseArray<>();
 
-    public CalendarPagerAdapter(AttributeSet attrs) {
+    private int count;
+    private int[] start;
+
+    public CalendarPagerAdapter(AttributeSet attrs, int count, int[] start) {
         this.attrs = attrs;
+        this.count = count;
+        this.start = start;
     }
 
     @Override
     public int getCount() {
-        return 150 * 12;
+        return count;
     }
 
     @Override
@@ -38,17 +45,25 @@ public class CalendarPagerAdapter extends PagerAdapter {
             view = new MonthView(container.getContext(), attrs);
         }
 
-        int[] date = CalendarUtil.positionToDate(position);
-
+        int[] date = CalendarUtil.positionToDate(position, start[0], start[1]);
+        view.setTag(String.valueOf(position));
         view.setDateList(CalendarUtil.getMonthDate(date[0], date[1]));
 
+        mViews.put(position, view);
+
         container.addView(view);
+
         return view;
     }
 
     @Override
     public void destroyItem(ViewGroup container, int position, Object object) {
-        container.removeView((View) object);
+        container.removeView((MonthView) object);
         cache.addLast((MonthView) object);
+        mViews.remove(position);
+    }
+
+    public SparseArray<MonthView> getViews() {
+        return mViews;
     }
 }

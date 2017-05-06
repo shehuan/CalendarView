@@ -96,19 +96,26 @@ public class CalendarUtil {
      * @param position
      * @return
      */
-    public static int[] positionToDate(int position) {
-        int year = position / 12 + 1900;
-        int month = position % 12;
+    public static int[] positionToDate(int position, int startY, int startM) {
+        int year = position / 12 + startY;
+        int month = position % 12 + startM;
 
-        if (position % 12 == 0) {
-            year -= 1;
-            month = 12;
+        if (month > 12) {
+            month = month % 12;
+            year = year + 1;
         }
 
         return new int[]{year, month};
     }
 
-    public static int dateToPosition(int year, int month) {
-        return (year - 1900) * 12 + month;
+    /**
+     * 根据年月得到ViewPager position
+     *
+     * @param year
+     * @param month
+     * @return
+     */
+    public static int dateToPosition(int year, int month, int startY, int startM) {
+        return (year - startY) * 12 + month - startM;
     }
 }

@@ -1,13 +1,18 @@
 package com.othershe.calendarviewtest;
 
+import android.content.DialogInterface;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.TextUtils;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.TextView;
 
 import com.othershe.calendarview.CalendarView;
 import com.othershe.calendarview.DateBean;
-import com.othershe.calendarview.listener.OnItemClickListener;
+import com.othershe.calendarview.listener.OnMonthItemClickListener;
 import com.othershe.calendarview.listener.OnPagerChangeListener;
 import com.othershe.calendarview.utils.SolarUtil;
 
@@ -34,15 +39,46 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        calendarView.setOnItemClickListener(new OnItemClickListener() {
+        calendarView.setOnItemClickListener(new OnMonthItemClickListener() {
             @Override
-            public void onItemClick(DateBean date) {
+            public void onCurrentMonthClick(DateBean date) {
                 title.setText(date.getSolar()[0] + "年" + date.getSolar()[1] + "月" + date.getSolar()[2] + "日");
+            }
+
+            @Override
+            public void onLastMonthClick(DateBean date) {
+
+            }
+
+            @Override
+            public void onNextMonthClick(DateBean date) {
+
             }
         });
 
         calendarView.setOnCalendarViewAdapter(10, null);
 
+    }
+
+    public void someday(View v) {
+        View view = LayoutInflater.from(MainActivity.this).inflate(R.layout.input_layout, null);
+        final EditText year = (EditText) view.findViewById(R.id.year);
+        final EditText month = (EditText) view.findViewById(R.id.month);
+
+        new AlertDialog.Builder(this)
+                .setView(view)
+                .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        if (TextUtils.isEmpty(year.getText()) || TextUtils.isEmpty(month.getText())) {
+                            return;
+                        }
+                        calendarView.toSpecifyDate(Integer.valueOf(year.getText().toString()),
+                                Integer.valueOf(month.getText().toString()), 1);
+                        dialog.dismiss();
+                    }
+                })
+                .setNegativeButton("取消", null).show();
     }
 
     public void today(View view) {

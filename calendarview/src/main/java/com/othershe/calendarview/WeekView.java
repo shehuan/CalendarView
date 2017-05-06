@@ -12,7 +12,7 @@ public class WeekView extends View {
 
     private String[] weekStr = {"日", "一", "二", "三", "四", "五", "六"};
     private int weekSize = 13;
-    private int weekColor = Color.BLACK;
+    private int weekColor = Color.parseColor("#153A65");
 
     private Paint mPaint;
     private DisplayMetrics mDisplayMetrics;
@@ -48,7 +48,7 @@ public class WeekView extends View {
         int heightSize = MeasureSpec.getSize(heightMeasureSpec);
         int heightMode = MeasureSpec.getMode(heightMeasureSpec);
         if (heightMode == MeasureSpec.AT_MOST) {
-            heightSize = mDisplayMetrics.densityDpi * 40;
+            heightSize = mDisplayMetrics.densityDpi * 35;
         }
         if (widthMode == MeasureSpec.AT_MOST) {
             widthSize = mDisplayMetrics.densityDpi * 300;

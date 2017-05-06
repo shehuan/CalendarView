@@ -5,7 +5,7 @@ import android.support.v4.view.ViewPager;
 import android.util.AttributeSet;
 
 import com.othershe.calendarview.listener.CalendarViewAdapter;
-import com.othershe.calendarview.listener.OnItemClickListener;
+import com.othershe.calendarview.listener.OnMonthItemClickListener;
 import com.othershe.calendarview.listener.OnMultiChooseListener;
 import com.othershe.calendarview.listener.OnPagerChangeListener;
 import com.othershe.calendarview.utils.CalendarUtil;
@@ -16,10 +16,18 @@ public class CalendarView extends ViewPager {
     private int currentPosition;
 
     private OnPagerChangeListener pagerChangeListener;
-    private OnItemClickListener itemClickListener;
+    private OnMonthItemClickListener itemClickListener;
     private OnMultiChooseListener multiChooseListener;
     private CalendarViewAdapter calendarViewAdapter;
     private int item_layout;
+
+    private int[] start = {1990, 1};
+    private int[] end = {2025, 12};
+    private int count;
+
+    private int lastClickPosition;
+
+    private CalendarPagerAdapter calendarPagerAdapter;
 
     public CalendarView(Context context) {
         this(context, null);
@@ -27,23 +35,31 @@ public class CalendarView extends ViewPager {
 
     public CalendarView(Context context, AttributeSet attrs) {
         super(context, attrs);
-        setAdapter(new CalendarPagerAdapter(attrs));
+        setOffscreenPageLimit(0);
+        //根据设定的日期范围计算日历的页数
+        count = (end[0] - start[0]) * 12 + end[1] - start[1] + 1;
+        calendarPagerAdapter = new CalendarPagerAdapter(attrs, count, start);
+        setAdapter(calendarPagerAdapter);
 
-        currentPosition = CalendarUtil.dateToPosition(SolarUtil.getCurrentDate()[0], SolarUtil.getCurrentDate()[1]);
+        currentPosition = CalendarUtil.dateToPosition(SolarUtil.getCurrentDate()[0], SolarUtil.getCurrentDate()[1], start[0], start[1]);
         setCurrentItem(currentPosition, false);
-        getAdapter().notifyDataSetChanged();
 
         addOnPageChangeListener(new SimpleOnPageChangeListener() {
             @Override
             public void onPageSelected(int position) {
+                MonthView monthView = calendarPagerAdapter.getViews().get(position);
+                monthView.refresh(lastClickPosition);
                 currentPosition = position;
                 if (pagerChangeListener != null) {
-                    pagerChangeListener.onPagerChanged(CalendarUtil.positionToDate(position));
+                    pagerChangeListener.onPagerChanged(CalendarUtil.positionToDate(position, start[0], start[1]));
                 }
             }
         });
     }
 
+    public void setLastClickPosition(int position) {
+        lastClickPosition = position;
+    }
 
     /**
      * 计算 ViewPager 高度
@@ -83,11 +99,11 @@ public class CalendarView extends ViewPager {
      *
      * @param itemClickListener
      */
-    public void setOnItemClickListener(OnItemClickListener itemClickListener) {
+    public void setOnItemClickListener(OnMonthItemClickListener itemClickListener) {
         this.itemClickListener = itemClickListener;
     }
 
-    public OnItemClickListener getItemClickListener() {
+    public OnMonthItemClickListener getItemClickListener() {
         return itemClickListener;
     }
 
@@ -109,7 +125,7 @@ public class CalendarView extends ViewPager {
      * 跳转到今天
      */
     public void today() {
-        setCurrentItem(CalendarUtil.dateToPosition(SolarUtil.getCurrentDate()[0], SolarUtil.getCurrentDate()[1]), false);
+        setCurrentItem(CalendarUtil.dateToPosition(SolarUtil.getCurrentDate()[0], SolarUtil.getCurrentDate()[1], start[0], start[1]), false);
     }
 
     /**
@@ -120,14 +136,14 @@ public class CalendarView extends ViewPager {
      * @param day
      */
     public void toSpecifyDate(int year, int month, int day) {
-        setCurrentItem(CalendarUtil.dateToPosition(year, month), false);
+        setCurrentItem(CalendarUtil.dateToPosition(year, month, start[0], start[1]), false);
     }
 
     /**
      * 跳转到下个月
      */
     public void nextMonth() {
-        if (currentPosition < 150 * 12)
+        if (currentPosition < count - 1)
             setCurrentItem(++currentPosition, false);
     }
 
