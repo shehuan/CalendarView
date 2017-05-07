@@ -7,7 +7,9 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.othershe.calendarview.utils.CalendarUtil;
+import com.othershe.calendarview.utils.SolarUtil;
 
+import java.util.Date;
 import java.util.LinkedList;
 
 public class CalendarPagerAdapter extends PagerAdapter {
@@ -18,12 +20,14 @@ public class CalendarPagerAdapter extends PagerAdapter {
     private SparseArray<MonthView> mViews = new SparseArray<>();
 
     private int count;
-    private int[] start;
+    private int[] startDate;
+    private int[] initDate;
 
-    public CalendarPagerAdapter(AttributeSet attrs, int count, int[] start) {
+    public CalendarPagerAdapter(AttributeSet attrs, int count, int[] startDate, int[] initDate) {
         this.attrs = attrs;
         this.count = count;
-        this.start = start;
+        this.startDate = startDate;
+        this.initDate = initDate;
     }
 
     @Override
@@ -42,15 +46,12 @@ public class CalendarPagerAdapter extends PagerAdapter {
         if (!cache.isEmpty()) {
             view = cache.removeFirst();
         } else {
-            view = new MonthView(container.getContext(), attrs);
+            view = new MonthView(container.getContext(), attrs, initDate);
         }
-
-        int[] date = CalendarUtil.positionToDate(position, start[0], start[1]);
-        view.setTag(String.valueOf(position));
-        view.setDateList(CalendarUtil.getMonthDate(date[0], date[1]));
-
+        //根据position计算对应年、月
+        int[] date = CalendarUtil.positionToDate(position, startDate[0], startDate[1]);
+        view.setDateList(CalendarUtil.getMonthDate(date[0], date[1]), SolarUtil.getMonthDays(date[0], date[1]));
         mViews.put(position, view);
-
         container.addView(view);
 
         return view;

@@ -1,5 +1,7 @@
 package com.othershe.calendarview.utils;
 
+import android.text.TextUtils;
+
 import com.othershe.calendarview.DateBean;
 
 import java.util.ArrayList;
@@ -117,5 +119,17 @@ public class CalendarUtil {
      */
     public static int dateToPosition(int year, int month, int startY, int startM) {
         return (year - startY) * 12 + month - startM;
+    }
+
+    public static int[] strToArray(String str) {
+        if (!TextUtils.isEmpty(str)) {
+            String[] strArray = str.split("\\.");
+            int[] result = new int[strArray.length];
+            for (int i = 0; i < strArray.length; i++) {
+                result[i] = Integer.valueOf(strArray[i]);
+            }
+            return result;
+        }
+        return null;
     }
 }

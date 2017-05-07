@@ -35,7 +35,7 @@ public class MainActivity extends AppCompatActivity {
         calendarView.setOnPagerChangeListener(new OnPagerChangeListener() {
             @Override
             public void onPagerChanged(int[] date) {
-                title.setText(date[0] + "年" + date[1] + "月");
+                title.setText(date[0] + "年" + date[1] + "月" + date[2] + "日");
             }
         });
 
@@ -96,10 +96,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void start(View view) {
-        calendarView.toSpecifyDate(1900, 1, 1);
+        calendarView.toSpecifyDate(1990, 1, 0);
     }
 
     public void end(View view) {
-        calendarView.toSpecifyDate(2049, 12, 1);
+        calendarView.toSpecifyDate(2025, 12, 0);
     }
 }

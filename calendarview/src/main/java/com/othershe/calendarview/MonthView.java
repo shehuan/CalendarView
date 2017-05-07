@@ -9,8 +9,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.othershe.calendarview.utils.SolarUtil;
-
 import java.util.List;
 
 public class MonthView extends ViewGroup {
@@ -24,33 +22,44 @@ public class MonthView extends ViewGroup {
     private Context mContext;
 
     private View lastClickedView;//记录上次点击的Item
-    private int currentMonthDays;
+    private int currentMonthDays;//记录当月天数
+    private int lastMonthDays;//记录当月显示的上个月天数
+    private int nextMonthDays;//记录当月显示的下个月天数
+    private boolean findInitShowDay = false;//是否找到默认选中的日期（不设置则选中当天）
 
     private boolean showLastNext = true;//是否显示上个月、下个月
     private boolean showHoliday = true;//是否显示节假日
     private boolean showLunar = true;//是否显示农历
-    private boolean useBefore = true;//指定日期前的所有日期是否可用
+    private boolean enableBefore = true;//指定日期前的所有日期是否可用
+    private int[] initDate;
 
     public MonthView(Context context) {
-        this(context, null);
+        this(context, null, null);
     }
 
-    public MonthView(Context context, AttributeSet attrs) {
+    public MonthView(Context context, AttributeSet attrs, int[] initDate) {
         super(context, attrs, 0);
         mContext = context;
+        this.initDate = initDate;
         setBackgroundColor(Color.WHITE);
     }
 
-    public void setDateList(List<DateBean> datas) {
+    /**
+     * @param dates            需要展示的日期数据
+     * @param currentMonthDays 当月天数
+     */
+    public void setDateList(List<DateBean> dates, int currentMonthDays) {
         if (getChildCount() > 0) {
             removeAllViews();
         }
-        int[] today = SolarUtil.getCurrentDate();
-        currentMonthDays = 0;
-        for (int i = 0; i < datas.size(); i++) {
-            final DateBean date = datas.get(i);
+        lastMonthDays = 0;
+        nextMonthDays = 0;
+        this.currentMonthDays = currentMonthDays;
+        for (int i = 0; i < dates.size(); i++) {
+            final DateBean date = dates.get(i);
 
             if (!showLastNext) {
+                enableBefore = true;
                 if (date.getType() == 0 || date.getType() == 2) {
                     addView(new View(mContext), i);
                     continue;
@@ -60,20 +69,21 @@ public class MonthView extends ViewGroup {
             View view = LayoutInflater.from(mContext).inflate(R.layout.item_month_layout, null);
             if (date.getType() == 1) {
                 view.setTag(date.getSolar()[2]);
-                ++currentMonthDays;
             } else if (date.getType() == 0) {
-                view.setTag(0);
+                lastMonthDays++;
+            } else if (date.getType() == 2) {
+                nextMonthDays++;
             }
             TextView day = (TextView) view.findViewById(R.id.day);
             final TextView lunarDay = (TextView) view.findViewById(R.id.lunar_day);
 
-            //设置阳历
+            //设置上个月和下个月的阳历颜色
             if (date.getType() == 0 || date.getType() == 2) {
                 day.setTextColor(Color.parseColor("#999999"));
             }
             day.setText(String.valueOf(date.getSolar()[2]));
 
-            //设置农历
+            //设置农历（节假日显示）
             if (showLunar) {
                 if ("初一".equals(date.getLunar()[1])) {
                     lunarDay.setText(date.getLunar()[0]);
@@ -96,25 +106,32 @@ public class MonthView extends ViewGroup {
             }
 
             //默认选中当天
-            if (today[0] == date.getSolar()[0] && today[1] == date.getSolar()[1]
-                    && today[2] == date.getSolar()[2] && date.getType() == 1) {
+            if (!findInitShowDay
+                    && date.getType() == 1
+                    && initDate[0] == date.getSolar()[0]
+                    && initDate[1] == date.getSolar()[1]
+                    && initDate[2] == date.getSolar()[2]) {
                 view.setBackgroundResource(R.drawable.blue_circle);
                 lastClickedView = view;
                 setTextColor(view, COLOR_SET);
+                findInitShowDay = true;
             }
 
-            if (!useBefore && (date.getSolar()[0] < today[0]
-                    || (date.getSolar()[0] == today[0] && date.getSolar()[1] < today[1])
-                    || (date.getSolar()[0] == today[0] && date.getSolar()[1] == today[1] && date.getSolar()[2] < today[2]))) {
+            if (!enableBefore
+                    && (date.getSolar()[0] < initDate[0]
+                    || (date.getSolar()[0] == initDate[0] && date.getSolar()[1] < initDate[1])
+                    || (date.getSolar()[0] == initDate[0] && date.getSolar()[1] == initDate[1] && date.getSolar()[2] < initDate[2]))) {
                 day.setTextColor(Color.parseColor("#999999"));
                 lunarDay.setTextColor(Color.parseColor("#999999"));
                 addView(view, i);
                 continue;
             }
+
             view.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     CalendarView calendarView = (CalendarView) getParent();
+                    calendarView.setLastClickDay(date.getSolar()[2]);
                     if (date.getType() == 1) {//点击当月
                         if (lastClickedView != null) {
                             lastClickedView.setBackgroundResource(0);
@@ -132,14 +149,10 @@ public class MonthView extends ViewGroup {
                         calendarView.nextMonth();
                         calendarView.getItemClickListener().onNextMonthClick(date);
                     }
-
-                    calendarView.setLastClickDay(date.getSolar()[2]);
                 }
             });
-
             addView(view, i);
         }
-
         requestLayout();
     }
 
@@ -234,18 +247,15 @@ public class MonthView extends ViewGroup {
         invalidate();
     }
 
+    /**
+     * 查找要跳转到的页面需要展示的日期View
+     *
+     * @param day
+     * @return
+     */
     private View findDestView(int day) {
         View view = null;
-        int lastMonthDays = 0;
-        for (int i = 0; i < getChildCount(); i++) {
-            if (getChildAt(i).getTag() == null) {
-                continue;
-            }
-
-            if ((Integer) getChildAt(i).getTag() == 0) {
-                ++lastMonthDays;
-            }
-
+        for (int i = lastMonthDays; i < getChildCount() - nextMonthDays; i++) {
             if ((Integer) getChildAt(i).getTag() == day) {
                 view = getChildAt(i);
                 break;

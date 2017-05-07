@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:calendarview="http://schemas.android.com/apk/res-auto"
     android:id="@+id/activity_main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -44,7 +45,10 @@
     <com.othershe.calendarview.CalendarView
         android:id="@+id/calendar"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        calendarview:end_date="2025.12"
+        calendarview:init_date="2017.5.20"
+        calendarview:start_date="1990.1" />
 
     <LinearLayout
         android:layout_width="match_parent"

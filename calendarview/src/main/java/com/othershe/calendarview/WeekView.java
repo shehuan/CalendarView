@@ -12,7 +12,7 @@ public class WeekView extends View {
 
     private String[] weekStr = {"日", "一", "二", "三", "四", "五", "六"};
     private int weekSize = 13;
-    private int weekColor = Color.parseColor("#153A65");
+    private int weekColor = Color.BLACK;
 
     private Paint mPaint;
     private DisplayMetrics mDisplayMetrics;

@@ -11,8 +11,8 @@
         <attr name="start_date" format="string" />
         <!--结束日期(xxxx.x)-->
         <attr name="end_date" format="string" />
-        <!--当前日期(xxxx.x.x)-->
-        <attr name="current_date" format="string" />
+        <!--默认展示、选中的日期(xxxx.x.x)-->
+        <attr name="init_date" format="string" />
         <!--阳历的日期颜色-->
         <attr name="solar_color" format="color" />
         <!--阳历的日期大小-->

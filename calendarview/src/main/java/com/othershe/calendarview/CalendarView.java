@@ -1,6 +1,7 @@
 package com.othershe.calendarview;
 
 import android.content.Context;
+import android.content.res.TypedArray;
 import android.support.v4.view.ViewPager;
 import android.util.AttributeSet;
 
@@ -21,11 +22,12 @@ public class CalendarView extends ViewPager {
     private CalendarViewAdapter calendarViewAdapter;
     private int item_layout;
 
-    private int[] start = {1990, 1};
-    private int[] end = {2025, 12};
-    private int count;
+    private int[] startDate;//日历的开始年、月
+    private int[] endDate;//日历的结束年、月
+    private int[] initDate;//默认展示、选中的日期（年、月、日）
+    private int count;//ViewPager的页数
 
-    private int lastClickedDay;
+    private int lastClickedDay;//上次点击的日期
 
     private CalendarPagerAdapter calendarPagerAdapter;
 
@@ -35,30 +37,51 @@ public class CalendarView extends ViewPager {
 
     public CalendarView(Context context, AttributeSet attrs) {
         super(context, attrs);
-        lastClickedDay = SolarUtil.getCurrentDate()[2];
+        TypedArray ta = context.obtainStyledAttributes(attrs, R.styleable.CalendarView);
+        String startDateStr = ta.getString(R.styleable.CalendarView_start_date);
+        String endDateStr = ta.getString(R.styleable.CalendarView_end_date);
+        String initDateStr = ta.getString(R.styleable.CalendarView_init_date);
+
+        startDate = CalendarUtil.strToArray(startDateStr);
+        if (startDate == null) {
+            startDate = new int[]{1900, 1};
+        }
+        endDate = CalendarUtil.strToArray(endDateStr);
+        if (endDate == null) {
+            endDate = new int[]{2049, 12};
+        }
+
+        initDate = CalendarUtil.strToArray(initDateStr);
+        if (initDate == null) {
+            initDate = SolarUtil.getCurrentDate();
+        }
+
+        ta.recycle();
+
+        init(attrs);
+    }
+
+    private void init(AttributeSet attrs) {
+        lastClickedDay = initDate[2];
         //根据设定的日期范围计算日历的页数
-        count = (end[0] - start[0]) * 12 + end[1] - start[1] + 1;
-        calendarPagerAdapter = new CalendarPagerAdapter(attrs, count, start);
+        count = (endDate[0] - startDate[0]) * 12 + endDate[1] - startDate[1] + 1;
+        calendarPagerAdapter = new CalendarPagerAdapter(attrs, count, startDate, initDate);
         setAdapter(calendarPagerAdapter);
 
-        currentPosition = CalendarUtil.dateToPosition(SolarUtil.getCurrentDate()[0], SolarUtil.getCurrentDate()[1], start[0], start[1]);
+        currentPosition = CalendarUtil.dateToPosition(initDate[0], initDate[1], startDate[0], startDate[1]);
         setCurrentItem(currentPosition, false);
 
         addOnPageChangeListener(new SimpleOnPageChangeListener() {
             @Override
             public void onPageSelected(int position) {
-                MonthView monthView = calendarPagerAdapter.getViews().get(position);
-                monthView.refresh(lastClickedDay);
+                refreshMonthView(position);
                 currentPosition = position;
                 if (pagerChangeListener != null) {
-                    pagerChangeListener.onPagerChanged(CalendarUtil.positionToDate(position, start[0], start[1]));
+                    int[] date = CalendarUtil.positionToDate(position, startDate[0], startDate[1]);
+                    pagerChangeListener.onPagerChanged(new int[]{date[0], date[1], lastClickedDay});
                 }
             }
         });
-    }
-
-    public void setLastClickDay(int day) {
-        lastClickedDay = day;
     }
 
     /**
@@ -79,6 +102,25 @@ public class CalendarView extends ViewPager {
                 setMeasuredDimension(widthMeasureSpec, MeasureSpec.makeMeasureSpec(calendarHeight, MeasureSpec.EXACTLY));
             }
         }
+    }
+
+    /**
+     * 刷新MonthView
+     *
+     * @param position
+     */
+    private void refreshMonthView(int position) {
+        MonthView monthView = calendarPagerAdapter.getViews().get(position);
+        monthView.refresh(lastClickedDay);
+    }
+
+    /**
+     * 设置上次点击的日期
+     *
+     * @param day
+     */
+    public void setLastClickDay(int day) {
+        lastClickedDay = day;
     }
 
     /**
@@ -126,7 +168,12 @@ public class CalendarView extends ViewPager {
      */
     public void today() {
         lastClickedDay = SolarUtil.getCurrentDate()[2];
-        setCurrentItem(CalendarUtil.dateToPosition(SolarUtil.getCurrentDate()[0], SolarUtil.getCurrentDate()[1], start[0], start[1]), false);
+        int destPosition = CalendarUtil.dateToPosition(SolarUtil.getCurrentDate()[0], SolarUtil.getCurrentDate()[1], startDate[0], startDate[1]);
+        if (destPosition == currentPosition) {
+            refreshMonthView(destPosition);
+        } else {
+            setCurrentItem(destPosition, false);
+        }
     }
 
     /**
@@ -137,8 +184,8 @@ public class CalendarView extends ViewPager {
      * @param day
      */
     public void toSpecifyDate(int year, int month, int day) {
-        lastClickedDay = day;
-        setCurrentItem(CalendarUtil.dateToPosition(year, month, start[0], start[1]), false);
+        lastClickedDay = day != 0 ? day : lastClickedDay;
+        setCurrentItem(CalendarUtil.dateToPosition(year, month, startDate[0], startDate[1]), false);
     }
 
     /**
