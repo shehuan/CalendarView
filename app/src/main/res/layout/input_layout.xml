@@ -16,4 +16,10 @@
         android:layout_height="wrap_content"
         android:hint="输入月" />
 
+    <EditText
+        android:id="@+id/day"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="输入日" />
+
 </LinearLayout>

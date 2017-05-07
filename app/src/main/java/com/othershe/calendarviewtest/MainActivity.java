@@ -64,6 +64,7 @@ public class MainActivity extends AppCompatActivity {
         View view = LayoutInflater.from(MainActivity.this).inflate(R.layout.input_layout, null);
         final EditText year = (EditText) view.findViewById(R.id.year);
         final EditText month = (EditText) view.findViewById(R.id.month);
+        final EditText day = (EditText) view.findViewById(R.id.day);
 
         new AlertDialog.Builder(this)
                 .setView(view)
@@ -74,7 +75,8 @@ public class MainActivity extends AppCompatActivity {
                             return;
                         }
                         calendarView.toSpecifyDate(Integer.valueOf(year.getText().toString()),
-                                Integer.valueOf(month.getText().toString()), 1);
+                                Integer.valueOf(month.getText().toString()),
+                                Integer.valueOf(day.getText().toString()));
                         dialog.dismiss();
                     }
                 })

@@ -25,7 +25,7 @@ public class CalendarView extends ViewPager {
     private int[] end = {2025, 12};
     private int count;
 
-    private int lastClickPosition;
+    private int lastClickedDay;
 
     private CalendarPagerAdapter calendarPagerAdapter;
 
@@ -35,7 +35,7 @@ public class CalendarView extends ViewPager {
 
     public CalendarView(Context context, AttributeSet attrs) {
         super(context, attrs);
-        setOffscreenPageLimit(0);
+        lastClickedDay = SolarUtil.getCurrentDate()[2];
         //根据设定的日期范围计算日历的页数
         count = (end[0] - start[0]) * 12 + end[1] - start[1] + 1;
         calendarPagerAdapter = new CalendarPagerAdapter(attrs, count, start);
@@ -48,7 +48,7 @@ public class CalendarView extends ViewPager {
             @Override
             public void onPageSelected(int position) {
                 MonthView monthView = calendarPagerAdapter.getViews().get(position);
-                monthView.refresh(lastClickPosition);
+                monthView.refresh(lastClickedDay);
                 currentPosition = position;
                 if (pagerChangeListener != null) {
                     pagerChangeListener.onPagerChanged(CalendarUtil.positionToDate(position, start[0], start[1]));
@@ -57,8 +57,8 @@ public class CalendarView extends ViewPager {
         });
     }
 
-    public void setLastClickPosition(int position) {
-        lastClickPosition = position;
+    public void setLastClickDay(int day) {
+        lastClickedDay = day;
     }
 
     /**
@@ -125,6 +125,7 @@ public class CalendarView extends ViewPager {
      * 跳转到今天
      */
     public void today() {
+        lastClickedDay = SolarUtil.getCurrentDate()[2];
         setCurrentItem(CalendarUtil.dateToPosition(SolarUtil.getCurrentDate()[0], SolarUtil.getCurrentDate()[1], start[0], start[1]), false);
     }
 
@@ -136,6 +137,7 @@ public class CalendarView extends ViewPager {
      * @param day
      */
     public void toSpecifyDate(int year, int month, int day) {
+        lastClickedDay = day;
         setCurrentItem(CalendarUtil.dateToPosition(year, month, start[0], start[1]), false);
     }
 

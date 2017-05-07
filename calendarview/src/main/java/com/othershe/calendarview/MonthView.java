@@ -24,6 +24,7 @@ public class MonthView extends ViewGroup {
     private Context mContext;
 
     private View lastClickedView;//记录上次点击的Item
+    private int currentMonthDays;
 
     private boolean showLastNext = true;//是否显示上个月、下个月
     private boolean showHoliday = true;//是否显示节假日
@@ -45,7 +46,7 @@ public class MonthView extends ViewGroup {
             removeAllViews();
         }
         int[] today = SolarUtil.getCurrentDate();
-
+        currentMonthDays = 0;
         for (int i = 0; i < datas.size(); i++) {
             final DateBean date = datas.get(i);
 
@@ -57,6 +58,12 @@ public class MonthView extends ViewGroup {
             }
 
             View view = LayoutInflater.from(mContext).inflate(R.layout.item_month_layout, null);
+            if (date.getType() == 1) {
+                view.setTag(date.getSolar()[2]);
+                ++currentMonthDays;
+            } else if (date.getType() == 0) {
+                view.setTag(0);
+            }
             TextView day = (TextView) view.findViewById(R.id.day);
             final TextView lunarDay = (TextView) view.findViewById(R.id.lunar_day);
 
@@ -104,8 +111,6 @@ public class MonthView extends ViewGroup {
                 addView(view, i);
                 continue;
             }
-
-            final int finalI = i;
             view.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -118,7 +123,6 @@ public class MonthView extends ViewGroup {
                         v.setBackgroundResource(R.drawable.blue_circle);
                         setTextColor(v, COLOR_SET);
                         calendarView.getItemClickListener().onCurrentMonthClick(date);
-                        calendarView.setLastClickPosition(finalI);
                         lastClickedView = v;
                     } else if (date.getType() == 0) {//点击上月
                         calendarView.lastMonth();
@@ -128,6 +132,8 @@ public class MonthView extends ViewGroup {
                         calendarView.nextMonth();
                         calendarView.getItemClickListener().onNextMonthClick(date);
                     }
+
+                    calendarView.setLastClickDay(date.getSolar()[2]);
                 }
             });
 
@@ -216,15 +222,39 @@ public class MonthView extends ViewGroup {
         }
     }
 
-    public void refresh(int position) {
+    public void refresh(int day) {
         if (lastClickedView != null) {
             lastClickedView.setBackgroundResource(0);
             setTextColor(lastClickedView, COLOR_RESET);
         }
-        View destView = getChildAt(position);
+        View destView = findDestView(day);
         setTextColor(destView, COLOR_SET);
         destView.setBackgroundResource(R.drawable.blue_circle);
         lastClickedView = destView;
         invalidate();
+    }
+
+    private View findDestView(int day) {
+        View view = null;
+        int lastMonthDays = 0;
+        for (int i = 0; i < getChildCount(); i++) {
+            if (getChildAt(i).getTag() == null) {
+                continue;
+            }
+
+            if ((Integer) getChildAt(i).getTag() == 0) {
+                ++lastMonthDays;
+            }
+
+            if ((Integer) getChildAt(i).getTag() == day) {
+                view = getChildAt(i);
+                break;
+            }
+        }
+
+        if (view == null) {
+            view = getChildAt(currentMonthDays + lastMonthDays - 1);
+        }
+        return view;
     }
 }
