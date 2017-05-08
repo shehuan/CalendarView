@@ -12,6 +12,7 @@ import android.widget.TextView;
 
 import com.othershe.calendarview.CalendarView;
 import com.othershe.calendarview.DateBean;
+import com.othershe.calendarview.listener.CalendarViewAdapter;
 import com.othershe.calendarview.listener.OnMonthItemClickListener;
 import com.othershe.calendarview.listener.OnPagerChangeListener;
 import com.othershe.calendarview.utils.SolarUtil;
@@ -56,7 +57,12 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        calendarView.setOnCalendarViewAdapter(10, null);
+        calendarView.setOnCalendarViewAdapter(10, new CalendarViewAdapter() {
+            @Override
+            public void convertView(View view, DateBean date) {
+
+            }
+        });
 
     }
 

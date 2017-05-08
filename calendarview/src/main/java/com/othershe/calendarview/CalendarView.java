@@ -2,6 +2,7 @@ package com.othershe.calendarview;
 
 import android.content.Context;
 import android.content.res.TypedArray;
+import android.graphics.Color;
 import android.support.v4.view.ViewPager;
 import android.util.AttributeSet;
 
@@ -22,9 +23,21 @@ public class CalendarView extends ViewPager {
     private CalendarViewAdapter calendarViewAdapter;
     private int item_layout;
 
-    private int[] startDate;//日历的开始年、月
-    private int[] endDate;//日历的结束年、月
-    private int[] initDate;//默认展示、选中的日期（年、月、日）
+    private int[] dateStart;//日历的开始年、月
+    private int[] dateEnd;//日历的结束年、月
+    private int[] dateInit;//默认展示、选中的日期（年、月、日）
+    private boolean showLastNext = true;//是否显示上个月、下个月
+    private boolean showLunar = true;//是否显示农历
+    private boolean showHoliday = true;//是否显示节假日(不显示农历则节假日无法显示，节假日会覆盖农历显示)
+    private boolean disableBefore = false;//默认展示、选中的日期前的所有日期是否可用
+    private int colorSolar = Color.BLACK;//阳历的日期颜色
+    private int colorLunar = Color.parseColor("#999999");//阴历的日期颜色
+    private int colorHoliday = Color.parseColor("#EC9729");//节假日的颜色
+    private int colorChoose = Color.WHITE;//选中的日期文字颜色
+    private int sizeSolar = 16;//阳历日期文字尺寸
+    private int sizeLunar = 10;//阴历日期文字尺寸
+    private int dayBg = R.drawable.blue_circle;//选中的背景
+
     private int count;//ViewPager的页数
 
     private int lastClickedDay;//上次点击的日期
@@ -37,38 +50,81 @@ public class CalendarView extends ViewPager {
 
     public CalendarView(Context context, AttributeSet attrs) {
         super(context, attrs);
+        initAttr(context, attrs);
+        init();
+    }
+
+    private void initAttr(Context context, AttributeSet attrs) {
+        String dateStartStr = null;
+        String dateEndStr = null;
+        String dateInitStr = null;
+
         TypedArray ta = context.obtainStyledAttributes(attrs, R.styleable.CalendarView);
-        String startDateStr = ta.getString(R.styleable.CalendarView_start_date);
-        String endDateStr = ta.getString(R.styleable.CalendarView_end_date);
-        String initDateStr = ta.getString(R.styleable.CalendarView_init_date);
-
-        startDate = CalendarUtil.strToArray(startDateStr);
-        if (startDate == null) {
-            startDate = new int[]{1900, 1};
-        }
-        endDate = CalendarUtil.strToArray(endDateStr);
-        if (endDate == null) {
-            endDate = new int[]{2049, 12};
-        }
-
-        initDate = CalendarUtil.strToArray(initDateStr);
-        if (initDate == null) {
-            initDate = SolarUtil.getCurrentDate();
+        for (int i = 0; i < ta.getIndexCount(); i++) {
+            int attr = ta.getIndex(i);
+            if (attr == R.styleable.CalendarView_date_start) {
+                dateStartStr = ta.getString(attr);
+            } else if (attr == R.styleable.CalendarView_date_end) {
+                dateEndStr = ta.getString(attr);
+            } else if (attr == R.styleable.CalendarView_date_init) {
+                dateInitStr = ta.getString(attr);
+            } else if (attr == R.styleable.CalendarView_show_last_next) {
+                showLastNext = ta.getBoolean(attr, true);
+            } else if (attr == R.styleable.CalendarView_show_lunar) {
+                showLunar = ta.getBoolean(attr, true);
+            } else if (attr == R.styleable.CalendarView_show_holiday) {
+                showHoliday = ta.getBoolean(attr, true);
+            } else if (attr == R.styleable.CalendarView_disable_before) {
+                disableBefore = ta.getBoolean(attr, true);
+            } else if (attr == R.styleable.CalendarView_color_solar) {
+                colorSolar = ta.getColor(attr, colorSolar);
+            } else if (attr == R.styleable.CalendarView_size_solar) {
+                sizeSolar = ta.getInteger(R.styleable.CalendarView_size_solar, sizeSolar);
+            } else if (attr == R.styleable.CalendarView_color_lunar) {
+                colorLunar = ta.getColor(attr, colorLunar);
+            } else if (attr == R.styleable.CalendarView_size_lunar) {
+                sizeLunar = ta.getDimensionPixelSize(R.styleable.CalendarView_size_lunar, sizeLunar);
+            } else if (attr == R.styleable.CalendarView_color_holiday) {
+                colorHoliday = ta.getColor(attr, colorHoliday);
+            } else if (attr == R.styleable.CalendarView_color_choose) {
+                colorChoose = ta.getColor(attr, colorChoose);
+            } else if (attr == R.styleable.CalendarView_day_bg) {
+                dayBg = ta.getResourceId(attr, dayBg);
+            }
         }
 
         ta.recycle();
 
-        init(attrs);
+        dateStart = CalendarUtil.strToArray(dateStartStr);
+        if (dateStart == null) {
+            dateStart = new int[]{1900, 1};
+        }
+        dateEnd = CalendarUtil.strToArray(dateEndStr);
+        if (dateEnd == null) {
+            dateEnd = new int[]{2049, 12};
+        }
+
+        dateInit = CalendarUtil.strToArray(dateInitStr);
+        if (dateInit == null) {
+            dateInit = SolarUtil.getCurrentDate();
+        }
+
+        sizeSolar = CalendarUtil.getTextSize(context, sizeSolar);
+        sizeLunar = CalendarUtil.getTextSize(context, sizeLunar);
     }
 
-    private void init(AttributeSet attrs) {
-        lastClickedDay = initDate[2];
+    private void init() {
+        lastClickedDay = dateInit[2];
         //根据设定的日期范围计算日历的页数
-        count = (endDate[0] - startDate[0]) * 12 + endDate[1] - startDate[1] + 1;
-        calendarPagerAdapter = new CalendarPagerAdapter(attrs, count, startDate, initDate);
+        count = (dateEnd[0] - dateStart[0]) * 12 + dateEnd[1] - dateStart[1] + 1;
+        calendarPagerAdapter = new CalendarPagerAdapter(count);
+        calendarPagerAdapter.setAttrValues(dateInit, dateStart,
+                showLastNext, showLunar, showHoliday, disableBefore,
+                colorSolar, colorLunar, colorHoliday, colorChoose,
+                sizeSolar, sizeLunar, dayBg);
         setAdapter(calendarPagerAdapter);
 
-        currentPosition = CalendarUtil.dateToPosition(initDate[0], initDate[1], startDate[0], startDate[1]);
+        currentPosition = CalendarUtil.dateToPosition(dateInit[0], dateInit[1], dateStart[0], dateStart[1]);
         setCurrentItem(currentPosition, false);
 
         addOnPageChangeListener(new SimpleOnPageChangeListener() {
@@ -77,12 +133,13 @@ public class CalendarView extends ViewPager {
                 refreshMonthView(position);
                 currentPosition = position;
                 if (pagerChangeListener != null) {
-                    int[] date = CalendarUtil.positionToDate(position, startDate[0], startDate[1]);
+                    int[] date = CalendarUtil.positionToDate(position, dateStart[0], dateStart[1]);
                     pagerChangeListener.onPagerChanged(new int[]{date[0], date[1], lastClickedDay});
                 }
             }
         });
     }
+
 
     /**
      * 计算 ViewPager 高度
@@ -168,7 +225,7 @@ public class CalendarView extends ViewPager {
      */
     public void today() {
         lastClickedDay = SolarUtil.getCurrentDate()[2];
-        int destPosition = CalendarUtil.dateToPosition(SolarUtil.getCurrentDate()[0], SolarUtil.getCurrentDate()[1], startDate[0], startDate[1]);
+        int destPosition = CalendarUtil.dateToPosition(SolarUtil.getCurrentDate()[0], SolarUtil.getCurrentDate()[1], dateStart[0], dateStart[1]);
         if (destPosition == currentPosition) {
             refreshMonthView(destPosition);
         } else {
@@ -185,7 +242,7 @@ public class CalendarView extends ViewPager {
      */
     public void toSpecifyDate(int year, int month, int day) {
         lastClickedDay = day != 0 ? day : lastClickedDay;
-        setCurrentItem(CalendarUtil.dateToPosition(year, month, startDate[0], startDate[1]), false);
+        setCurrentItem(CalendarUtil.dateToPosition(year, month, dateStart[0], dateStart[1]), false);
     }
 
     /**

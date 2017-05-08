@@ -1,21 +1,24 @@
 package com.othershe.calendarview;
 
 import android.content.Context;
+import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.text.TextUtils;
 import android.util.AttributeSet;
-import android.util.DisplayMetrics;
 import android.view.View;
+
+import com.othershe.calendarview.utils.CalendarUtil;
 
 public class WeekView extends View {
 
-    private String[] weekStr = {"日", "一", "二", "三", "四", "五", "六"};
-    private int weekSize = 13;
-    private int weekColor = Color.BLACK;
+    private String[] weekArray = {"日", "一", "二", "三", "四", "五", "六"};
+    private int weekSize = 13;//文字尺寸
+    private int weekColor = Color.BLACK;//文字颜色
 
     private Paint mPaint;
-    private DisplayMetrics mDisplayMetrics;
+    private Context context;
 
     public WeekView(Context context) {
         this(context, null);
@@ -27,16 +30,44 @@ public class WeekView extends View {
 
     public WeekView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
+        this.context = context;
+        initAttrs(attrs);
         initPaint();
         setBackgroundColor(Color.WHITE);
     }
 
+    private void initAttrs(AttributeSet attrs) {
+        String weekStr = null;
+        TypedArray ta = context.obtainStyledAttributes(attrs, R.styleable.WeekView);
+        for (int i = 0; i < ta.getIndexCount(); i++) {
+            int attr = ta.getIndex(i);
+            if (attr == R.styleable.WeekView_week_color) {
+                weekColor = ta.getColor(R.styleable.WeekView_week_color, weekColor);
+            } else if (attr == R.styleable.WeekView_week_size) {
+                weekSize = ta.getInteger(R.styleable.WeekView_week_size, weekSize);
+            } else if (attr == R.styleable.WeekView_week_str) {
+                weekStr = ta.getString(R.styleable.WeekView_week_str);
+            }
+        }
+        ta.recycle();
+
+        if (!TextUtils.isEmpty(weekStr)) {
+            String[] weeks = weekStr.split("\\.");
+            if (weeks.length != 7) {
+                return;
+            }
+            System.arraycopy(weeks, 0, weekArray, 0, 7);
+        }
+
+        weekSize = CalendarUtil.getTextSize1(context, weekSize);
+    }
+
+
     private void initPaint() {
-        mDisplayMetrics = getResources().getDisplayMetrics();
         mPaint = new Paint();
         mPaint.setColor(weekColor);
         mPaint.setAntiAlias(true);
-        mPaint.setTextSize(weekSize * mDisplayMetrics.scaledDensity);
+        mPaint.setTextSize(weekSize);
     }
 
     @Override
@@ -48,10 +79,10 @@ public class WeekView extends View {
         int heightSize = MeasureSpec.getSize(heightMeasureSpec);
         int heightMode = MeasureSpec.getMode(heightMeasureSpec);
         if (heightMode == MeasureSpec.AT_MOST) {
-            heightSize = mDisplayMetrics.densityDpi * 35;
+            heightSize = CalendarUtil.getPxSize(context, 35);
         }
         if (widthMode == MeasureSpec.AT_MOST) {
-            widthSize = mDisplayMetrics.densityDpi * 300;
+            widthSize = CalendarUtil.getPxSize(context, 300);
         }
         setMeasuredDimension(widthSize, heightSize);
     }
@@ -63,8 +94,8 @@ public class WeekView extends View {
         int height = getHeight();
         int itemWidth = width / 7;
 
-        for (int i = 0; i < weekStr.length; i++) {
-            String text = weekStr[i];
+        for (int i = 0; i < weekArray.length; i++) {
+            String text = weekArray[i];
             int textWidth = (int) mPaint.measureText(text);
             int startX = itemWidth * i + (itemWidth - textWidth) / 2;
             int startY = (int) (height / 2 - (mPaint.ascent() + mPaint.descent()) / 2);

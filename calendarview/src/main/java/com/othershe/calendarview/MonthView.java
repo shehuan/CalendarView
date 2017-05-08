@@ -9,6 +9,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.othershe.calendarview.listener.CalendarViewAdapter;
+
 import java.util.List;
 
 public class MonthView extends ViewGroup {
@@ -25,22 +27,32 @@ public class MonthView extends ViewGroup {
     private int currentMonthDays;//记录当月天数
     private int lastMonthDays;//记录当月显示的上个月天数
     private int nextMonthDays;//记录当月显示的下个月天数
-    private boolean findInitShowDay = false;//是否找到默认选中的日期（不设置则选中当天）
+    private boolean findInitShowDay = false;//是否找到默认选中的日期
 
-    private boolean showLastNext = true;//是否显示上个月、下个月
-    private boolean showHoliday = true;//是否显示节假日
-    private boolean showLunar = true;//是否显示农历
-    private boolean enableBefore = true;//指定日期前的所有日期是否可用
-    private int[] initDate;
+    private boolean showLastNext;
+    private boolean showLunar;
+    private boolean showHoliday;
+    private boolean disableBefore;
+    private int colorSolar;
+    private int colorLunar;
+    private int colorHoliday;
+    private int colorChoose;
+    private int sizeSolar;
+    private int sizeLunar;
+    private int dayBg;
+    private int[] dateInit;
+
+    private int item_layout;
+    private CalendarViewAdapter calendarViewAdapter;
 
     public MonthView(Context context) {
-        this(context, null, null);
+        this(context, null);
     }
 
-    public MonthView(Context context, AttributeSet attrs, int[] initDate) {
+    public MonthView(Context context, AttributeSet attrs) {
         super(context, attrs, 0);
+
         mContext = context;
-        this.initDate = initDate;
         setBackgroundColor(Color.WHITE);
     }
 
@@ -54,41 +66,48 @@ public class MonthView extends ViewGroup {
         }
         lastMonthDays = 0;
         nextMonthDays = 0;
+
         this.currentMonthDays = currentMonthDays;
         for (int i = 0; i < dates.size(); i++) {
             final DateBean date = dates.get(i);
 
-            if (!showLastNext) {
-                enableBefore = true;
-                if (date.getType() == 0 || date.getType() == 2) {
+            if (date.getType() == 0) {
+                lastMonthDays++;
+                if (!showLastNext) {
+                    addView(new View(mContext), i);
+                    continue;
+                }
+            }
+
+            if (date.getType() == 2) {
+                nextMonthDays++;
+                if (!showLastNext) {
                     addView(new View(mContext), i);
                     continue;
                 }
             }
 
             View view = LayoutInflater.from(mContext).inflate(R.layout.item_month_layout, null);
-            if (date.getType() == 1) {
-                view.setTag(date.getSolar()[2]);
-            } else if (date.getType() == 0) {
-                lastMonthDays++;
-            } else if (date.getType() == 2) {
-                nextMonthDays++;
-            }
-            TextView day = (TextView) view.findViewById(R.id.day);
+            TextView solarDay = (TextView) view.findViewById(R.id.day);
+            solarDay.setTextColor(colorSolar);
+            solarDay.setTextSize(sizeSolar);
             final TextView lunarDay = (TextView) view.findViewById(R.id.lunar_day);
+            lunarDay.setTextColor(colorLunar);
+            lunarDay.setTextSize(sizeLunar);
 
             //设置上个月和下个月的阳历颜色
             if (date.getType() == 0 || date.getType() == 2) {
-                day.setTextColor(Color.parseColor("#999999"));
+                solarDay.setTextColor(colorLunar);
             }
-            day.setText(String.valueOf(date.getSolar()[2]));
+            solarDay.setText(String.valueOf(date.getSolar()[2]));
 
             //设置农历（节假日显示）
             if (showLunar) {
                 if ("初一".equals(date.getLunar()[1])) {
                     lunarDay.setText(date.getLunar()[0]);
-                    if ("春节".equals(date.getLunar()[0])) {
-                        lunarDay.setTextColor(Color.parseColor("#EC9729"));
+                    if ("正月".equals(date.getLunar()[0]) && showHoliday) {
+                        lunarDay.setTextColor(colorHoliday);
+                        lunarDay.setText("春节");
                     }
                 } else {
                     if (!TextUtils.isEmpty(date.getSolarHoliday()) && showHoliday) {//阳历节日
@@ -108,23 +127,28 @@ public class MonthView extends ViewGroup {
             //默认选中当天
             if (!findInitShowDay
                     && date.getType() == 1
-                    && initDate[0] == date.getSolar()[0]
-                    && initDate[1] == date.getSolar()[1]
-                    && initDate[2] == date.getSolar()[2]) {
-                view.setBackgroundResource(R.drawable.blue_circle);
+                    && dateInit[0] == date.getSolar()[0]
+                    && dateInit[1] == date.getSolar()[1]
+                    && dateInit[2] == date.getSolar()[2]) {
+                view.setBackgroundResource(dayBg);
                 lastClickedView = view;
-                setTextColor(view, COLOR_SET);
+                setDayColor(view, COLOR_SET);
                 findInitShowDay = true;
             }
 
-            if (!enableBefore
-                    && (date.getSolar()[0] < initDate[0]
-                    || (date.getSolar()[0] == initDate[0] && date.getSolar()[1] < initDate[1])
-                    || (date.getSolar()[0] == initDate[0] && date.getSolar()[1] == initDate[1] && date.getSolar()[2] < initDate[2]))) {
-                day.setTextColor(Color.parseColor("#999999"));
-                lunarDay.setTextColor(Color.parseColor("#999999"));
-                addView(view, i);
-                continue;
+            if (date.getType() == 1) {
+                view.setTag(date.getSolar()[2]);
+                if ((date.getSolar()[0] < dateInit[0]
+                        || (date.getSolar()[0] == dateInit[0] && date.getSolar()[1] < dateInit[1])
+                        || (date.getSolar()[0] == dateInit[0] && date.getSolar()[1] == dateInit[1] && date.getSolar()[2] < dateInit[2]))) {
+                    if (disableBefore) {
+                        solarDay.setTextColor(colorLunar);
+                        lunarDay.setTextColor(colorLunar);
+                        view.setTag(-1);
+                        addView(view, i);
+                        continue;
+                    }
+                }
             }
 
             view.setOnClickListener(new OnClickListener() {
@@ -135,10 +159,10 @@ public class MonthView extends ViewGroup {
                     if (date.getType() == 1) {//点击当月
                         if (lastClickedView != null) {
                             lastClickedView.setBackgroundResource(0);
-                            setTextColor(lastClickedView, COLOR_RESET);
+                            setDayColor(lastClickedView, COLOR_RESET);
                         }
-                        v.setBackgroundResource(R.drawable.blue_circle);
-                        setTextColor(v, COLOR_SET);
+                        v.setBackgroundResource(dayBg);
+                        setDayColor(v, COLOR_SET);
                         calendarView.getItemClickListener().onCurrentMonthClick(date);
                         lastClickedView = v;
                     } else if (date.getType() == 0) {//点击上月
@@ -159,25 +183,27 @@ public class MonthView extends ViewGroup {
     private void setLunarText(String str, TextView text, int type) {
         text.setText(str);
         if (type == 1) {
-            text.setTextColor(Color.parseColor("#EC9729"));
+            text.setTextColor(colorHoliday);
         }
-        text.setTag("lunar");
+        text.setTag("holiday");
     }
 
-    private void setTextColor(View v, int type) {
-        TextView day = (TextView) v.findViewById(R.id.day);
+    private void setDayColor(View v, int type) {
+        TextView solarDay = (TextView) v.findViewById(R.id.day);
         TextView lunarDay = (TextView) v.findViewById(R.id.lunar_day);
+        solarDay.setTextSize(sizeSolar);
+        lunarDay.setTextSize(sizeLunar);
 
         if (type == 0) {
-            day.setTextColor(Color.BLACK);
-            if ("lunar".equals(lunarDay.getTag())) {
-                lunarDay.setTextColor(Color.parseColor("#EC9729"));
+            solarDay.setTextColor(colorSolar);
+            if ("holiday".equals(lunarDay.getTag())) {
+                lunarDay.setTextColor(colorHoliday);
             } else {
-                lunarDay.setTextColor(Color.parseColor("#999999"));
+                lunarDay.setTextColor(colorLunar);
             }
         } else if (type == 1) {
-            day.setTextColor(Color.WHITE);
-            lunarDay.setTextColor(Color.WHITE);
+            solarDay.setTextColor(colorChoose);
+            lunarDay.setTextColor(colorChoose);
         }
     }
 
@@ -236,13 +262,16 @@ public class MonthView extends ViewGroup {
     }
 
     public void refresh(int day) {
+        View destView = findDestView(day);
+        if (destView == null) {
+            return;
+        }
         if (lastClickedView != null) {
             lastClickedView.setBackgroundResource(0);
-            setTextColor(lastClickedView, COLOR_RESET);
+            setDayColor(lastClickedView, COLOR_RESET);
         }
-        View destView = findDestView(day);
-        setTextColor(destView, COLOR_SET);
-        destView.setBackgroundResource(R.drawable.blue_circle);
+        setDayColor(destView, COLOR_SET);
+        destView.setBackgroundResource(dayBg);
         lastClickedView = destView;
         invalidate();
     }
@@ -265,6 +294,33 @@ public class MonthView extends ViewGroup {
         if (view == null) {
             view = getChildAt(currentMonthDays + lastMonthDays - 1);
         }
+
+        if ((Integer) view.getTag() == -1) {
+            view = null;
+        }
         return view;
+    }
+
+    public void setAttrValues(int[] dateInit,
+                              boolean showLastNext, boolean showLunar, boolean showHoliday, boolean disableBefore,
+                              int colorSolar, int colorLunar, int colorHoliday, int colorChoose,
+                              int sizeSolar, int sizeLunar, int dayBg) {
+        this.dateInit = dateInit;
+        this.showLastNext = showLastNext;
+        this.showLunar = showLunar;
+        this.showHoliday = showHoliday;
+        this.disableBefore = disableBefore;
+        this.colorSolar = colorSolar;
+        this.colorLunar = colorLunar;
+        this.colorHoliday = colorHoliday;
+        this.colorChoose = colorChoose;
+        this.sizeSolar = sizeSolar;
+        this.sizeLunar = sizeLunar;
+        this.dayBg = dayBg;
+    }
+
+    public void setOnCalendarViewAdapter(int item_layout, CalendarViewAdapter calendarViewAdapter) {
+        this.item_layout = item_layout;
+        this.calendarViewAdapter = calendarViewAdapter;
     }
 }

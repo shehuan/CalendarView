@@ -1,6 +1,8 @@
 package com.othershe.calendarview.utils;
 
+import android.content.Context;
 import android.text.TextUtils;
+import android.util.TypedValue;
 
 import com.othershe.calendarview.DateBean;
 
@@ -131,5 +133,18 @@ public class CalendarUtil {
             return result;
         }
         return null;
+    }
+
+    public static int getPxSize(Context context, int size) {
+        return size * context.getResources().getDisplayMetrics().densityDpi;
+    }
+
+    public static int getTextSize1(Context context, int size) {
+        return (int) (size * context.getResources().getDisplayMetrics().scaledDensity);
+    }
+
+    public static int getTextSize(Context context, int size) {
+        return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_PX, size, context.getResources().getDisplayMetrics());
+
     }
 }
