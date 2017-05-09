@@ -1,5 +1,7 @@
 package com.othershe.calendarview.utils;
 
+import android.text.TextUtils;
+
 import java.util.Calendar;
 
 public class SolarUtil {
@@ -14,53 +16,98 @@ public class SolarUtil {
      * @return
      */
     public static String getSolarHoliday(int year, int month, int day) {
+        int md = (int) (month * Math.pow(10, day > 10 ? 2 : 1));
         String holiday = "";
-        if (month == 1 && day == 1) {
-            holiday = "元旦";
-        } else if (month == 2 && day == 14) {
-            holiday = "情人节";
-        } else if (month == 3 && day == 8) {
-            holiday = "妇女节";
-        } else if (month == 3 && day == 12) {
-            holiday = "植树节";
-        } else if (month == 4 && day == 1) {
-            holiday = "愚人节";
-        } else if (month == 4) {
-            if (day >= 4 && day <= 6) {
-                if (year <= 1999) {
-                    int compare = (int) (((year - 1900) * 0.2422 + 5.59) - ((year - 1900) / 4));
-                    if (compare == day) {
-                        holiday = "清明节";
-                    }
-                } else {
-                    int compare = (int) (((year - 2000) * 0.2422 + 4.81) - ((year - 2000) / 4));
-                    if (compare == day) {
-                        holiday = "清明节";
-                    }
+        switch (md) {
+            case 11:
+                holiday = "元旦";
+                break;
+            case 214:
+                holiday = "情人节";
+                break;
+            case 38:
+                holiday = "妇女节";
+                break;
+            case 312:
+                holiday = "植树节";
+                break;
+            case 41:
+                holiday = "愚人节";
+                break;
+            case 51:
+                holiday = "劳动节";
+                break;
+            case 54:
+                holiday = "青年节";
+                break;
+            case 512:
+                holiday = "护士节";
+                break;
+            case 61:
+                holiday = "儿童节";
+                break;
+            case 71:
+                holiday = "建党节";
+                break;
+            case 81:
+                holiday = "建军节";
+                break;
+            case 910:
+                holiday = "教师节";
+                break;
+            case 101:
+                holiday = "国庆节";
+                break;
+            case 1111:
+                holiday = "光棍节";
+                break;
+            case 1224:
+                holiday = "平安夜";
+                break;
+            case 1225:
+                holiday = "圣诞节";
+                break;
+        }
+
+        if (!TextUtils.isEmpty(holiday)) {
+            return holiday;
+        }
+
+        if (month == 4) {
+            holiday = chingMingDay(year, day);
+        } else if (month == 5) {
+            if (day == motherFatherDay(year, month, 1)) {
+                holiday = "母亲节";
+            }
+        } else if (month == 6) {
+            if (day == motherFatherDay(year, month, 2)) {
+                holiday = "父亲节";
+            }
+        }
+
+        return holiday;
+    }
+
+    private static int motherFatherDay(int year, int month, int delta) {
+        int f = getFirstWeekOfMonth(year, month - 1);
+        f = f == 0 ? 7 : f;
+        return 7 - f + 1 + 7 * delta;
+    }
+
+    public static String chingMingDay(int year, int day) {
+        String holiday = "";
+        if (day >= 4 && day <= 6) {
+            if (year <= 1999) {
+                int compare = (int) (((year - 1900) * 0.2422 + 5.59) - ((year - 1900) / 4));
+                if (compare == day) {
+                    holiday = "清明节";
+                }
+            } else {
+                int compare = (int) (((year - 2000) * 0.2422 + 4.81) - ((year - 2000) / 4));
+                if (compare == day) {
+                    holiday = "清明节";
                 }
             }
-        } else if (month == 5 && day == 1) {
-            holiday = "劳动节";
-        } else if (month == 5 && day == 4) {
-            holiday = "青年节";
-        } else if (month == 5 && day == 12) {
-            holiday = "护士节";
-        } else if (month == 6 && day == 1) {
-            holiday = "儿童节";
-        } else if (month == 7 && day == 1) {
-            holiday = "建党节";
-        } else if (month == 8 && day == 1) {
-            holiday = "建军节";
-        } else if (month == 9 && day == 10) {
-            holiday = "教师节";
-        } else if (month == 10 && day == 1) {
-            holiday = "国庆节";
-        } else if (month == 11 && day == 11) {
-            holiday = "光棍节";
-        } else if (month == 12 && day == 24) {
-            holiday = "平安夜";
-        } else if (month == 12 && day == 25) {
-            holiday = "圣诞节";
         }
         return holiday;
     }
