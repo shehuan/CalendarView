@@ -3,6 +3,8 @@ package com.othershe.calendarview.utils;
 import java.util.Calendar;
 
 public class SolarUtil {
+    //母亲节5月的第二个星期日。父亲节6月的第三个星期日
+
     /**
      * 计算阳历节日
      *

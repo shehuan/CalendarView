@@ -52,13 +52,23 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
-        android:gravity="end">
+        android:layout_marginTop="20dp">
 
         <TextView
             android:layout_width="50dp"
             android:layout_height="50dp"
-            android:layout_marginLeft="10dp"
+            android:layout_marginLeft="5dp"
+            android:background="@drawable/circle_bg"
+            android:gravity="center"
+            android:onClick="today"
+            android:text="今"
+            android:textColor="#ffffff"
+            android:textSize="16sp" />
+
+        <TextView
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_marginLeft="5dp"
             android:background="@drawable/circle_bg"
             android:gravity="center"
             android:onClick="someday"
@@ -69,7 +79,7 @@
         <TextView
             android:layout_width="50dp"
             android:layout_height="50dp"
-            android:layout_marginLeft="10dp"
+            android:layout_marginLeft="5dp"
             android:background="@drawable/circle_bg"
             android:gravity="center"
             android:onClick="start"
@@ -80,7 +90,7 @@
         <TextView
             android:layout_width="50dp"
             android:layout_height="50dp"
-            android:layout_marginLeft="10dp"
+            android:layout_marginLeft="5dp"
             android:background="@drawable/circle_bg"
             android:gravity="center"
             android:onClick="end"
@@ -91,11 +101,22 @@
         <TextView
             android:layout_width="50dp"
             android:layout_height="50dp"
-            android:layout_marginLeft="10dp"
+            android:layout_marginLeft="5dp"
             android:background="@drawable/circle_bg"
             android:gravity="center"
-            android:onClick="today"
-            android:text="今"
+            android:onClick="lastYear"
+            android:text="年-"
+            android:textColor="#ffffff"
+            android:textSize="16sp" />
+
+        <TextView
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_marginLeft="5dp"
+            android:background="@drawable/circle_bg"
+            android:gravity="center"
+            android:onClick="nextYear"
+            android:text="年+"
             android:textColor="#ffffff"
             android:textSize="16sp" />
 

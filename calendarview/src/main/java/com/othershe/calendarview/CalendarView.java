@@ -5,13 +5,16 @@ import android.content.res.TypedArray;
 import android.graphics.Color;
 import android.support.v4.view.ViewPager;
 import android.util.AttributeSet;
+import android.util.SparseArray;
 
 import com.othershe.calendarview.listener.CalendarViewAdapter;
 import com.othershe.calendarview.listener.OnMonthItemClickListener;
-import com.othershe.calendarview.listener.OnMultiChooseListener;
 import com.othershe.calendarview.listener.OnPagerChangeListener;
 import com.othershe.calendarview.utils.CalendarUtil;
 import com.othershe.calendarview.utils.SolarUtil;
+
+import java.util.HashSet;
+import java.util.Set;
 
 public class CalendarView extends ViewPager {
     //记录当前PagerAdapter的position
@@ -19,7 +22,6 @@ public class CalendarView extends ViewPager {
 
     private OnPagerChangeListener pagerChangeListener;
     private OnMonthItemClickListener itemClickListener;
-    private OnMultiChooseListener multiChooseListener;
     private CalendarViewAdapter calendarViewAdapter;
     private int item_layout;
 
@@ -29,6 +31,7 @@ public class CalendarView extends ViewPager {
     private boolean showLastNext = true;//是否显示上个月、下个月
     private boolean showLunar = true;//是否显示农历
     private boolean showHoliday = true;//是否显示节假日(不显示农历则节假日无法显示，节假日会覆盖农历显示)
+    private boolean showTerm = true;//是否显示节气
     private boolean disableBefore = false;//默认展示、选中的日期前的所有日期是否可用
     private int colorSolar = Color.BLACK;//阳历的日期颜色
     private int colorLunar = Color.parseColor("#999999");//阴历的日期颜色
@@ -39,8 +42,8 @@ public class CalendarView extends ViewPager {
     private int dayBg = R.drawable.blue_circle;//选中的背景
 
     private int count;//ViewPager的页数
-
     private int lastClickedDay;//上次点击的日期
+    private SparseArray<HashSet<Integer>> chooseDate = new SparseArray<>();//记录多选时全部选中的日期
 
     private CalendarPagerAdapter calendarPagerAdapter;
 
@@ -73,6 +76,8 @@ public class CalendarView extends ViewPager {
                 showLunar = ta.getBoolean(attr, true);
             } else if (attr == R.styleable.CalendarView_show_holiday) {
                 showHoliday = ta.getBoolean(attr, true);
+            } else if (attr == R.styleable.CalendarView_show_term) {
+                showTerm = ta.getBoolean(attr, true);
             } else if (attr == R.styleable.CalendarView_disable_before) {
                 disableBefore = ta.getBoolean(attr, true);
             } else if (attr == R.styleable.CalendarView_color_solar) {
@@ -118,7 +123,7 @@ public class CalendarView extends ViewPager {
         count = (dateEnd[0] - dateStart[0]) * 12 + dateEnd[1] - dateStart[1] + 1;
         calendarPagerAdapter = new CalendarPagerAdapter(count);
         calendarPagerAdapter.setAttrValues(dateInit, dateStart,
-                showLastNext, showLunar, showHoliday, disableBefore,
+                showLastNext, showLunar, showHoliday, showTerm, disableBefore,
                 colorSolar, colorLunar, colorHoliday, colorChoose,
                 sizeSolar, sizeLunar, dayBg);
 
@@ -127,6 +132,7 @@ public class CalendarView extends ViewPager {
         setAdapter(calendarPagerAdapter);
 
         currentPosition = CalendarUtil.dateToPosition(dateInit[0], dateInit[1], dateStart[0], dateStart[1]);
+        setLastChooseDate(dateInit[2], true);//因为有默认选中日期，所以需要此操作
         setCurrentItem(currentPosition, false);
 
         addOnPageChangeListener(new SimpleOnPageChangeListener() {
@@ -141,7 +147,6 @@ public class CalendarView extends ViewPager {
             }
         });
     }
-
 
     /**
      * 计算 ViewPager 高度
@@ -170,7 +175,12 @@ public class CalendarView extends ViewPager {
      */
     private void refreshMonthView(int position) {
         MonthView monthView = calendarPagerAdapter.getViews().get(position);
-        monthView.refresh(lastClickedDay);
+        if (itemClickListener != null && itemClickListener.isMultiChoose()) {
+            if (chooseDate.get(position) != null && chooseDate.get(position).size() > 0)
+                monthView.multiChooseRefresh(chooseDate.get(position));
+        } else {
+            monthView.refresh(lastClickedDay);
+        }
     }
 
     /**
@@ -183,16 +193,22 @@ public class CalendarView extends ViewPager {
     }
 
     /**
-     * 设置多选回调
+     * 设置多选时选中的日期
      *
-     * @param multiChooseListener
+     * @param day
+     * @param flag 多选时flag=true代表选中数据，flag=false代表取消选中
      */
-    public void setOnMultiChooseListener(OnMultiChooseListener multiChooseListener) {
-        this.multiChooseListener = multiChooseListener;
-    }
-
-    public OnMultiChooseListener getMultiChooseListener() {
-        return multiChooseListener;
+    public void setLastChooseDate(int day, boolean flag) {
+        HashSet<Integer> days = chooseDate.get(currentPosition);
+        if (flag) {
+            if (days == null) {
+                days = new HashSet<>();
+                chooseDate.put(currentPosition, days);
+            }
+            days.add(day);
+        } else {
+            days.remove(day);
+        }
     }
 
     /**
@@ -269,5 +285,37 @@ public class CalendarView extends ViewPager {
     public void lastMonth() {
         if (currentPosition > 0)
             setCurrentItem(--currentPosition, false);
+    }
+
+    /**
+     * 跳转到上一年的当前月
+     */
+    public void lastYear() {
+        if (currentPosition - 12 >= 0) {
+            setCurrentItem(currentPosition -= 12, false);
+        }
+    }
+
+    /**
+     * 跳转到下一年的当前月
+     */
+    public void nextYear() {
+        if (currentPosition + 12 <= count) {
+            setCurrentItem(currentPosition += 12, false);
+        }
+    }
+
+    /**
+     * 跳转到日历的开始年月
+     */
+    public void toStart() {
+        toSpecifyDate(dateStart[0], dateStart[1], lastClickedDay);
+    }
+
+    /**
+     * 跳转到日历的结束年月
+     */
+    public void toEnd() {
+        toSpecifyDate(dateEnd[0], dateEnd[1], lastClickedDay);
     }
 }

@@ -10,8 +10,11 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.othershe.calendarview.listener.CalendarViewAdapter;
+import com.othershe.calendarview.listener.OnMonthItemClickListener;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class MonthView extends ViewGroup {
 
@@ -27,11 +30,11 @@ public class MonthView extends ViewGroup {
     private int currentMonthDays;//记录当月天数
     private int lastMonthDays;//记录当月显示的上个月天数
     private int nextMonthDays;//记录当月显示的下个月天数
-    private boolean findInitShowDay = false;//是否找到默认选中的日期
 
     private boolean showLastNext;
     private boolean showLunar;
     private boolean showHoliday;
+    private boolean showTerm;
     private boolean disableBefore;
     private int colorSolar;
     private int colorLunar;
@@ -44,6 +47,7 @@ public class MonthView extends ViewGroup {
 
     private int item_layout;
     private CalendarViewAdapter calendarViewAdapter;
+    private Set<Integer> chooseDays = new HashSet<>();//记录多选时当前页选中的日期
 
     public MonthView(Context context) {
         this(context, null);
@@ -66,6 +70,8 @@ public class MonthView extends ViewGroup {
         }
         lastMonthDays = 0;
         nextMonthDays = 0;
+        boolean findInitShowDay = false;//是否找到默认选中的日期
+        chooseDays.clear();
 
         this.currentMonthDays = currentMonthDays;
         for (int i = 0; i < dates.size(); i++) {
@@ -88,8 +94,8 @@ public class MonthView extends ViewGroup {
             }
 
             View view;
-            TextView solarDay;
-            TextView lunarDay;
+            TextView solarDay;//阳历TextView
+            TextView lunarDay;//阴历TextView(节假日、节气同样使用阴历TextView来显示)
             if (item_layout != 0 && calendarViewAdapter != null) {
                 view = LayoutInflater.from(mContext).inflate(item_layout, null);
                 TextView[] views = calendarViewAdapter.convertView(view, date);
@@ -125,7 +131,7 @@ public class MonthView extends ViewGroup {
                         setLunarText(date.getSolarHoliday(), lunarDay, date.getType());
                     } else if (!TextUtils.isEmpty(date.getLunarHoliday()) && showHoliday) {//农历节日
                         setLunarText(date.getLunarHoliday(), lunarDay, date.getType());
-                    } else if (!TextUtils.isEmpty(date.getTerm()) && showHoliday) {//节气
+                    } else if (!TextUtils.isEmpty(date.getTerm()) && showTerm) {//节气
                         setLunarText(date.getTerm(), lunarDay, date.getType());
                     } else {
                         lunarDay.setText(date.getLunar()[1]);//农历日期
@@ -141,8 +147,8 @@ public class MonthView extends ViewGroup {
                     && dateInit[0] == date.getSolar()[0]
                     && dateInit[1] == date.getSolar()[1]
                     && dateInit[2] == date.getSolar()[2]) {
-                view.setBackgroundResource(dayBg);
                 lastClickedView = view;
+                chooseDays.add(date.getSolar()[2]);
                 setDayColor(view, COLOR_SET);
                 findInitShowDay = true;
             }
@@ -165,23 +171,39 @@ public class MonthView extends ViewGroup {
             view.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    int day = date.getSolar()[2];
+                    boolean flag = false;
                     CalendarView calendarView = (CalendarView) getParent();
-                    calendarView.setLastClickDay(date.getSolar()[2]);
+                    OnMonthItemClickListener listener = calendarView.getItemClickListener();
                     if (date.getType() == 1) {//点击当月
-                        if (lastClickedView != null) {
-                            lastClickedView.setBackgroundResource(0);
-                            setDayColor(lastClickedView, COLOR_RESET);
+                        if (listener != null && listener.isMultiChoose()) {//多选的情况
+                            if (chooseDays.contains(day)) {
+                                setDayColor(v, COLOR_RESET);
+                                chooseDays.remove(day);
+                                flag = false;
+                            } else {
+                                setDayColor(v, COLOR_SET);
+                                chooseDays.add(day);
+                                flag = true;
+                            }
+                            calendarView.setLastChooseDate(day, flag);
+                        } else {
+                            calendarView.setLastClickDay(day);
+                            if (lastClickedView != null) {
+                                setDayColor(lastClickedView, COLOR_RESET);
+                            }
+                            setDayColor(v, COLOR_SET);
+                            lastClickedView = v;
                         }
-                        v.setBackgroundResource(dayBg);
-                        setDayColor(v, COLOR_SET);
-                        lastClickedView = v;
                     } else if (date.getType() == 0) {//点击上月
                         calendarView.lastMonth();
                     } else if (date.getType() == 2) {//点击下月
                         calendarView.nextMonth();
                     }
 
-                    calendarView.getItemClickListener().onMonthItemClick(v, date);
+                    if (listener != null) {
+                        listener.onMonthItemClick(v, date, flag);
+                    }
                 }
             });
             addView(view, i);
@@ -204,6 +226,7 @@ public class MonthView extends ViewGroup {
         lunarDay.setTextSize(sizeLunar);
 
         if (type == 0) {
+            v.setBackgroundResource(0);
             solarDay.setTextColor(colorSolar);
             if ("holiday".equals(lunarDay.getTag())) {
                 lunarDay.setTextColor(colorHoliday);
@@ -211,6 +234,7 @@ public class MonthView extends ViewGroup {
                 lunarDay.setTextColor(colorLunar);
             }
         } else if (type == 1) {
+            v.setBackgroundResource(dayBg);
             solarDay.setTextColor(colorChoose);
             lunarDay.setTextColor(colorChoose);
         }
@@ -276,12 +300,26 @@ public class MonthView extends ViewGroup {
             return;
         }
         if (lastClickedView != null) {
-            lastClickedView.setBackgroundResource(0);
             setDayColor(lastClickedView, COLOR_RESET);
         }
         setDayColor(destView, COLOR_SET);
-        destView.setBackgroundResource(dayBg);
         lastClickedView = destView;
+        invalidate();
+    }
+
+    /**
+     * 多选时刷新日期，以恢复之前选中的日期
+     *
+     * @param set
+     */
+    public void multiChooseRefresh(HashSet<Integer> set) {
+        for (Integer day : set) {
+            setDayColor(findDestView(day), COLOR_SET);
+        }
+        //防止造成默认日期取消后代码重复选中的假象
+        if (chooseDays.contains(dateInit[2]) && !set.contains(dateInit[2])) {
+            setDayColor(findDestView(dateInit[2]), COLOR_RESET);
+        }
         invalidate();
     }
 
@@ -311,13 +349,14 @@ public class MonthView extends ViewGroup {
     }
 
     public void setAttrValues(int[] dateInit,
-                              boolean showLastNext, boolean showLunar, boolean showHoliday, boolean disableBefore,
+                              boolean showLastNext, boolean showLunar, boolean showHoliday, boolean showTerm, boolean disableBefore,
                               int colorSolar, int colorLunar, int colorHoliday, int colorChoose,
                               int sizeSolar, int sizeLunar, int dayBg) {
         this.dateInit = dateInit;
         this.showLastNext = showLastNext;
         this.showLunar = showLunar;
         this.showHoliday = showHoliday;
+        this.showTerm = showTerm;
         this.disableBefore = disableBefore;
         this.colorSolar = colorSolar;
         this.colorLunar = colorLunar;

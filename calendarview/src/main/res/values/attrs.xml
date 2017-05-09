@@ -9,6 +9,8 @@
         <attr name="show_last_next" format="boolean" />
         <!--是否显示节假日-->
         <attr name="show_holiday" format="boolean" />
+        <!--是否显示节气-->
+        <attr name="show_term" format="boolean" />
         <!--开始日期(xxxx.x)-->
         <attr name="date_start" format="string" />
         <!--结束日期(xxxx.x)-->

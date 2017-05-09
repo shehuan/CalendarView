@@ -1,15 +1,16 @@
 package com.othershe.calendarviewtest;
 
 import android.content.DialogInterface;
-import android.graphics.Color;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.othershe.calendarview.CalendarView;
 import com.othershe.calendarview.DateBean;
@@ -17,7 +18,6 @@ import com.othershe.calendarview.listener.CalendarViewAdapter;
 import com.othershe.calendarview.listener.OnMonthItemClickListener;
 import com.othershe.calendarview.listener.OnPagerChangeListener;
 import com.othershe.calendarview.utils.SolarUtil;
-
 
 public class MainActivity extends AppCompatActivity {
 
@@ -29,15 +29,15 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         final TextView title = (TextView) findViewById(R.id.title);
         calendarView = (CalendarView) findViewById(R.id.calendar);
-//        calendarView.init();
-        calendarView.setOnCalendarViewAdapter(R.layout.item_layout, new CalendarViewAdapter() {
-            @Override
-            public TextView[] convertView(View view, DateBean date) {
-                TextView solarDay = (TextView) view.findViewById(R.id.solar_day);
-                TextView lunarDay = (TextView) view.findViewById(R.id.lunar_day);
-                return new TextView[]{solarDay, lunarDay};
-            }
-        });
+        calendarView.init();
+//        calendarView.setOnCalendarViewAdapter(R.layout.item_layout, new CalendarViewAdapter() {
+//            @Override
+//            public TextView[] convertView(View view, DateBean date) {
+//                TextView solarDay = (TextView) view.findViewById(R.id.solar_day);
+//                TextView lunarDay = (TextView) view.findViewById(R.id.lunar_day);
+//                return new TextView[]{solarDay, lunarDay};
+//            }
+//        });
 
         title.setText(SolarUtil.getCurrentDate()[0] + "年"
                 + SolarUtil.getCurrentDate()[1] + "月"
@@ -53,8 +53,18 @@ public class MainActivity extends AppCompatActivity {
         calendarView.setOnItemClickListener(new OnMonthItemClickListener() {
 
             @Override
-            public void onMonthItemClick(View view, DateBean date) {
+            public void onMonthItemClick(View view, DateBean date, boolean flag) {
                 title.setText(date.getSolar()[0] + "年" + date.getSolar()[1] + "月" + date.getSolar()[2] + "日");
+
+                if (isMultiChoose()) {
+                    Log.e("MultiChoose：" + (flag ? "choose" : "cancel"),
+                            date.getSolar()[0] + "年" + date.getSolar()[1] + "月" + date.getSolar()[2] + "日");
+                }
+            }
+
+            @Override
+            public boolean isMultiChoose() {
+                return false;
             }
         });
     }
@@ -73,6 +83,7 @@ public class MainActivity extends AppCompatActivity {
                         if (TextUtils.isEmpty(year.getText())
                                 || TextUtils.isEmpty(month.getText())
                                 || TextUtils.isEmpty(day.getText())) {
+                            Toast.makeText(MainActivity.this, "请完善日期！", Toast.LENGTH_SHORT).show();
                             return;
                         }
                         calendarView.toSpecifyDate(Integer.valueOf(year.getText().toString()),
@@ -97,10 +108,18 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void start(View view) {
-        calendarView.toSpecifyDate(1990, 1, 0);
+        calendarView.toStart();
     }
 
     public void end(View view) {
-        calendarView.toSpecifyDate(2025, 12, 0);
+        calendarView.toEnd();
+    }
+
+    public void lastYear(View view) {
+        calendarView.lastYear();
+    }
+
+    public void nextYear(View view) {
+        calendarView.nextYear();
     }
 }
