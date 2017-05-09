@@ -65,6 +65,7 @@ public class CalendarPagerAdapter extends PagerAdapter {
                 showLastNext, showLunar, showHoliday, disableBefore,
                 colorSolar, colorLunar, colorHoliday, colorChoose,
                 sizeSolar, sizeLunar, dayBg);
+        view.setOnCalendarViewAdapter(item_layout, calendarViewAdapter);
         view.setDateList(CalendarUtil.getMonthDate(date[0], date[1]), SolarUtil.getMonthDays(date[0], date[1]));
         mViews.put(position, view);
         container.addView(view);

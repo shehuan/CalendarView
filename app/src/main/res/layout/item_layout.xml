@@ -2,8 +2,8 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:gravity="center_horizontal|center"
-    android:orientation="vertical">
+    android:gravity="center_vertical|center"
+    android:orientation="horizontal">
 
     <TextView
         android:id="@+id/solar_day"
@@ -15,6 +15,8 @@
         android:id="@+id/lunar_day"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginLeft="2dp"
+        android:ems="1"
         android:text="" />
 
 </LinearLayout>

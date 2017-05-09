@@ -87,11 +87,22 @@ public class MonthView extends ViewGroup {
                 }
             }
 
-            View view = LayoutInflater.from(mContext).inflate(R.layout.item_month_layout, null);
-            TextView solarDay = (TextView) view.findViewById(R.id.day);
+            View view;
+            TextView solarDay;
+            TextView lunarDay;
+            if (item_layout != 0 && calendarViewAdapter != null) {
+                view = LayoutInflater.from(mContext).inflate(item_layout, null);
+                TextView[] views = calendarViewAdapter.convertView(view, date);
+                solarDay = views[0];
+                lunarDay = views[1];
+            } else {
+                view = LayoutInflater.from(mContext).inflate(R.layout.item_month_layout, null);
+                solarDay = (TextView) view.findViewById(R.id.solar_day);
+                lunarDay = (TextView) view.findViewById(R.id.lunar_day);
+            }
+
             solarDay.setTextColor(colorSolar);
             solarDay.setTextSize(sizeSolar);
-            final TextView lunarDay = (TextView) view.findViewById(R.id.lunar_day);
             lunarDay.setTextColor(colorLunar);
             lunarDay.setTextSize(sizeLunar);
 
@@ -163,16 +174,14 @@ public class MonthView extends ViewGroup {
                         }
                         v.setBackgroundResource(dayBg);
                         setDayColor(v, COLOR_SET);
-                        calendarView.getItemClickListener().onCurrentMonthClick(date);
                         lastClickedView = v;
                     } else if (date.getType() == 0) {//点击上月
                         calendarView.lastMonth();
-                        calendarView.getItemClickListener().onLastMonthClick(date);
-
                     } else if (date.getType() == 2) {//点击下月
                         calendarView.nextMonth();
-                        calendarView.getItemClickListener().onNextMonthClick(date);
                     }
+
+                    calendarView.getItemClickListener().onMonthItemClick(v, date);
                 }
             });
             addView(view, i);
@@ -189,7 +198,7 @@ public class MonthView extends ViewGroup {
     }
 
     private void setDayColor(View v, int type) {
-        TextView solarDay = (TextView) v.findViewById(R.id.day);
+        TextView solarDay = (TextView) v.findViewById(R.id.solar_day);
         TextView lunarDay = (TextView) v.findViewById(R.id.lunar_day);
         solarDay.setTextSize(sizeSolar);
         lunarDay.setTextSize(sizeLunar);

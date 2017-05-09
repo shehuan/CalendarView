@@ -46,8 +46,7 @@
         android:id="@+id/calendar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        calendarview:date_end="2025.12"
-        calendarview:date_init="2017.5.8"
+        calendarview:date_end="2020.12"
         calendarview:date_start="1990.1" />
 
     <LinearLayout

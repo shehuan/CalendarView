@@ -1,6 +1,7 @@
 package com.othershe.calendarviewtest;
 
 import android.content.DialogInterface;
+import android.graphics.Color;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -28,6 +29,15 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         final TextView title = (TextView) findViewById(R.id.title);
         calendarView = (CalendarView) findViewById(R.id.calendar);
+//        calendarView.init();
+        calendarView.setOnCalendarViewAdapter(R.layout.item_layout, new CalendarViewAdapter() {
+            @Override
+            public TextView[] convertView(View view, DateBean date) {
+                TextView solarDay = (TextView) view.findViewById(R.id.solar_day);
+                TextView lunarDay = (TextView) view.findViewById(R.id.lunar_day);
+                return new TextView[]{solarDay, lunarDay};
+            }
+        });
 
         title.setText(SolarUtil.getCurrentDate()[0] + "年"
                 + SolarUtil.getCurrentDate()[1] + "月"
@@ -41,29 +51,12 @@ public class MainActivity extends AppCompatActivity {
         });
 
         calendarView.setOnItemClickListener(new OnMonthItemClickListener() {
+
             @Override
-            public void onCurrentMonthClick(DateBean date) {
+            public void onMonthItemClick(View view, DateBean date) {
                 title.setText(date.getSolar()[0] + "年" + date.getSolar()[1] + "月" + date.getSolar()[2] + "日");
             }
-
-            @Override
-            public void onLastMonthClick(DateBean date) {
-
-            }
-
-            @Override
-            public void onNextMonthClick(DateBean date) {
-
-            }
         });
-
-        calendarView.setOnCalendarViewAdapter(10, new CalendarViewAdapter() {
-            @Override
-            public void convertView(View view, DateBean date) {
-
-            }
-        });
-
     }
 
     public void someday(View v) {
@@ -77,7 +70,9 @@ public class MainActivity extends AppCompatActivity {
                 .setPositiveButton("确定", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        if (TextUtils.isEmpty(year.getText()) || TextUtils.isEmpty(month.getText())) {
+                        if (TextUtils.isEmpty(year.getText())
+                                || TextUtils.isEmpty(month.getText())
+                                || TextUtils.isEmpty(day.getText())) {
                             return;
                         }
                         calendarView.toSpecifyDate(Integer.valueOf(year.getText().toString()),

@@ -34,8 +34,8 @@ public class CalendarView extends ViewPager {
     private int colorLunar = Color.parseColor("#999999");//阴历的日期颜色
     private int colorHoliday = Color.parseColor("#EC9729");//节假日的颜色
     private int colorChoose = Color.WHITE;//选中的日期文字颜色
-    private int sizeSolar = 16;//阳历日期文字尺寸
-    private int sizeLunar = 10;//阴历日期文字尺寸
+    private int sizeSolar = 14;//阳历日期文字尺寸
+    private int sizeLunar = 8;//阴历日期文字尺寸
     private int dayBg = R.drawable.blue_circle;//选中的背景
 
     private int count;//ViewPager的页数
@@ -51,7 +51,6 @@ public class CalendarView extends ViewPager {
     public CalendarView(Context context, AttributeSet attrs) {
         super(context, attrs);
         initAttr(context, attrs);
-        init();
     }
 
     private void initAttr(Context context, AttributeSet attrs) {
@@ -113,7 +112,7 @@ public class CalendarView extends ViewPager {
         sizeLunar = CalendarUtil.getTextSize(context, sizeLunar);
     }
 
-    private void init() {
+    public void init() {
         lastClickedDay = dateInit[2];
         //根据设定的日期范围计算日历的页数
         count = (dateEnd[0] - dateStart[0]) * 12 + dateEnd[1] - dateStart[1] + 1;
@@ -122,6 +121,9 @@ public class CalendarView extends ViewPager {
                 showLastNext, showLunar, showHoliday, disableBefore,
                 colorSolar, colorLunar, colorHoliday, colorChoose,
                 sizeSolar, sizeLunar, dayBg);
+
+        calendarPagerAdapter.setOnCalendarViewAdapter(item_layout, calendarViewAdapter);
+
         setAdapter(calendarPagerAdapter);
 
         currentPosition = CalendarUtil.dateToPosition(dateInit[0], dateInit[1], dateStart[0], dateStart[1]);
@@ -215,9 +217,17 @@ public class CalendarView extends ViewPager {
         this.pagerChangeListener = pagerChangeListener;
     }
 
+    /**
+     * 设置自定义日期样式
+     *
+     * @param item_layout         自定义的日期item布局
+     * @param calendarViewAdapter 解析item的接口
+     */
     public void setOnCalendarViewAdapter(int item_layout, CalendarViewAdapter calendarViewAdapter) {
         this.item_layout = item_layout;
         this.calendarViewAdapter = calendarViewAdapter;
+
+        init();
     }
 
     /**
