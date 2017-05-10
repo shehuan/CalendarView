@@ -327,6 +327,7 @@ public class MonthView extends ViewGroup {
     public void multiChooseRefresh(HashSet<Integer> set) {
         for (Integer day : set) {
             setDayColor(findDestView(day), COLOR_SET);
+            chooseDays.add(day);
         }
         //防止造成默认日期取消后代码重复选中的假象
         if (chooseDays.contains(dateInit[2]) && !set.contains(dateInit[2])) {
