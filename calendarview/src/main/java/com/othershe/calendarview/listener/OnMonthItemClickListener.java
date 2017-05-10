@@ -11,14 +11,6 @@ public interface OnMonthItemClickListener {
     /**
      * @param view
      * @param date
-     * @param flag 多选时flag=true代表选中数据，flag=false代表取消选中
      */
-    void onMonthItemClick(View view, DateBean date, boolean flag);
-
-    /**
-     * 是否启用多选
-     *
-     * @return
-     */
-    boolean isMultiChoose();
+    void onMonthItemClick(View view, DateBean date);
 }

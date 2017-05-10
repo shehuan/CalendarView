@@ -8,13 +8,13 @@ import android.util.AttributeSet;
 import android.util.SparseArray;
 
 import com.othershe.calendarview.listener.CalendarViewAdapter;
+import com.othershe.calendarview.listener.OnMonthItemChooseListener;
 import com.othershe.calendarview.listener.OnMonthItemClickListener;
 import com.othershe.calendarview.listener.OnPagerChangeListener;
 import com.othershe.calendarview.utils.CalendarUtil;
 import com.othershe.calendarview.utils.SolarUtil;
 
 import java.util.HashSet;
-import java.util.Set;
 
 public class CalendarView extends ViewPager {
     //记录当前PagerAdapter的position
@@ -22,6 +22,7 @@ public class CalendarView extends ViewPager {
 
     private OnPagerChangeListener pagerChangeListener;
     private OnMonthItemClickListener itemClickListener;
+    private OnMonthItemChooseListener itemChooseListener;
     private CalendarViewAdapter calendarViewAdapter;
     private int item_layout;
 
@@ -175,7 +176,7 @@ public class CalendarView extends ViewPager {
      */
     private void refreshMonthView(int position) {
         MonthView monthView = calendarPagerAdapter.getViews().get(position);
-        if (itemClickListener != null && itemClickListener.isMultiChoose()) {
+        if (itemChooseListener != null) {
             if (chooseDate.get(position) != null && chooseDate.get(position).size() > 0)
                 monthView.multiChooseRefresh(chooseDate.get(position));
         } else {
@@ -218,6 +219,19 @@ public class CalendarView extends ViewPager {
      */
     public void setOnItemClickListener(OnMonthItemClickListener itemClickListener) {
         this.itemClickListener = itemClickListener;
+    }
+
+    public OnMonthItemChooseListener getItemChooseListener() {
+        return itemChooseListener;
+    }
+
+    /**
+     * 设置日期多选回调
+     *
+     * @param itemChooseListener
+     */
+    public void setOnMonthItemChooseListener(OnMonthItemChooseListener itemChooseListener) {
+        this.itemChooseListener = itemChooseListener;
     }
 
     public OnMonthItemClickListener getItemClickListener() {
@@ -317,5 +331,14 @@ public class CalendarView extends ViewPager {
      */
     public void toEnd() {
         toSpecifyDate(dateEnd[0], dateEnd[1], lastClickedDay);
+    }
+
+    /**
+     * 得到默认选中的日期
+     *
+     * @return
+     */
+    public DateBean getDateInit() {
+        return CalendarUtil.getDateBean(dateInit[0], dateInit[1], dateInit[2]);
     }
 }

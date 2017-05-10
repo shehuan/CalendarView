@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:calendarview="http://schemas.android.com/apk/res-auto"
+    xmlns:weekview="http://schemas.android.com/apk/res-auto"
     android:id="@+id/activity_main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -55,70 +56,81 @@
         android:layout_marginTop="20dp">
 
         <TextView
-            android:layout_width="50dp"
-            android:layout_height="50dp"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
             android:layout_marginLeft="5dp"
             android:background="@drawable/circle_bg"
             android:gravity="center"
             android:onClick="today"
-            android:text="今"
+            android:text="今天"
             android:textColor="#ffffff"
-            android:textSize="16sp" />
+            android:textSize="14sp" />
 
         <TextView
-            android:layout_width="50dp"
-            android:layout_height="50dp"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
             android:layout_marginLeft="5dp"
             android:background="@drawable/circle_bg"
             android:gravity="center"
             android:onClick="someday"
-            android:text="某"
+            android:text="某天"
             android:textColor="#ffffff"
-            android:textSize="16sp" />
+            android:textSize="14sp" />
 
         <TextView
-            android:layout_width="50dp"
-            android:layout_height="50dp"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
             android:layout_marginLeft="5dp"
             android:background="@drawable/circle_bg"
             android:gravity="center"
             android:onClick="start"
-            android:text="首"
+            android:text="首月"
             android:textColor="#ffffff"
-            android:textSize="16sp" />
+            android:textSize="14sp" />
 
         <TextView
-            android:layout_width="50dp"
-            android:layout_height="50dp"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
             android:layout_marginLeft="5dp"
             android:background="@drawable/circle_bg"
             android:gravity="center"
             android:onClick="end"
-            android:text="尾"
+            android:text="末月"
             android:textColor="#ffffff"
-            android:textSize="16sp" />
+            android:textSize="14sp" />
 
         <TextView
-            android:layout_width="50dp"
-            android:layout_height="50dp"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
             android:layout_marginLeft="5dp"
             android:background="@drawable/circle_bg"
             android:gravity="center"
             android:onClick="lastYear"
-            android:text="年-"
+            android:text="上年"
             android:textColor="#ffffff"
-            android:textSize="16sp" />
+            android:textSize="14sp" />
 
         <TextView
-            android:layout_width="50dp"
-            android:layout_height="50dp"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
             android:layout_marginLeft="5dp"
             android:background="@drawable/circle_bg"
             android:gravity="center"
             android:onClick="nextYear"
-            android:text="年+"
+            android:text="下年"
             android:textColor="#ffffff"
-            android:textSize="16sp" />
+            android:textSize="14sp" />
+
+        <TextView
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginLeft="5dp"
+            android:background="@drawable/circle_bg"
+            android:gravity="center"
+            android:onClick="multiChoose"
+            android:text="多选"
+            android:textColor="#ffffff"
+            android:textSize="14sp" />
 
     </LinearLayout>
 

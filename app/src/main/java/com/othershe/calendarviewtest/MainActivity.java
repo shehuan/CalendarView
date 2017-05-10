@@ -1,11 +1,11 @@
 package com.othershe.calendarviewtest;
 
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
@@ -17,7 +17,6 @@ import com.othershe.calendarview.DateBean;
 import com.othershe.calendarview.listener.CalendarViewAdapter;
 import com.othershe.calendarview.listener.OnMonthItemClickListener;
 import com.othershe.calendarview.listener.OnPagerChangeListener;
-import com.othershe.calendarview.utils.SolarUtil;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -39,9 +38,9 @@ public class MainActivity extends AppCompatActivity {
 //            }
 //        });
 
-        title.setText(SolarUtil.getCurrentDate()[0] + "年"
-                + SolarUtil.getCurrentDate()[1] + "月"
-                + SolarUtil.getCurrentDate()[2] + "日");
+        DateBean d = calendarView.getDateInit();
+
+        title.setText(d.getSolar()[0] + "年" + d.getSolar()[1] + "月" + d.getSolar()[2] + "日");
 
         calendarView.setOnPagerChangeListener(new OnPagerChangeListener() {
             @Override
@@ -51,20 +50,9 @@ public class MainActivity extends AppCompatActivity {
         });
 
         calendarView.setOnItemClickListener(new OnMonthItemClickListener() {
-
             @Override
-            public void onMonthItemClick(View view, DateBean date, boolean flag) {
+            public void onMonthItemClick(View view, DateBean date) {
                 title.setText(date.getSolar()[0] + "年" + date.getSolar()[1] + "月" + date.getSolar()[2] + "日");
-
-                if (isMultiChoose()) {
-                    Log.e("MultiChoose：" + (flag ? "choose" : "cancel"),
-                            date.getSolar()[0] + "年" + date.getSolar()[1] + "月" + date.getSolar()[2] + "日");
-                }
-            }
-
-            @Override
-            public boolean isMultiChoose() {
-                return false;
             }
         });
     }
@@ -121,5 +109,9 @@ public class MainActivity extends AppCompatActivity {
 
     public void nextYear(View view) {
         calendarView.nextYear();
+    }
+
+    public void multiChoose(View view) {
+        startActivity(new Intent(MainActivity.this, MultiChooseActivity.class));
     }
 }

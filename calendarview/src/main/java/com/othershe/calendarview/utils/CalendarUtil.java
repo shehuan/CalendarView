@@ -78,6 +78,10 @@ public class CalendarUtil {
         return dateBean;
     }
 
+    public static DateBean getDateBean(int year, int month, int day) {
+        return initDateBean(year, month, day, 1);
+    }
+
     /**
      * 计算当前月需要显示几行
      *

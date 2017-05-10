@@ -10,6 +10,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.othershe.calendarview.listener.CalendarViewAdapter;
+import com.othershe.calendarview.listener.OnMonthItemChooseListener;
 import com.othershe.calendarview.listener.OnMonthItemClickListener;
 
 import java.util.HashSet;
@@ -172,11 +173,12 @@ public class MonthView extends ViewGroup {
                 @Override
                 public void onClick(View v) {
                     int day = date.getSolar()[2];
-                    boolean flag = false;
                     CalendarView calendarView = (CalendarView) getParent();
-                    OnMonthItemClickListener listener = calendarView.getItemClickListener();
+                    OnMonthItemClickListener clickListener = calendarView.getItemClickListener();
+                    OnMonthItemChooseListener chooseListener = calendarView.getItemChooseListener();
                     if (date.getType() == 1) {//点击当月
-                        if (listener != null && listener.isMultiChoose()) {//多选的情况
+                        if (chooseListener != null) {//多选的情况
+                            boolean flag;
                             if (chooseDays.contains(day)) {
                                 setDayColor(v, COLOR_RESET);
                                 chooseDays.remove(day);
@@ -187,6 +189,7 @@ public class MonthView extends ViewGroup {
                                 flag = true;
                             }
                             calendarView.setLastChooseDate(day, flag);
+                            chooseListener.onMonthItemChoose(v, date, flag);
                         } else {
                             calendarView.setLastClickDay(day);
                             if (lastClickedView != null) {
@@ -194,15 +197,23 @@ public class MonthView extends ViewGroup {
                             }
                             setDayColor(v, COLOR_SET);
                             lastClickedView = v;
+
+                            if (clickListener != null) {
+                                clickListener.onMonthItemClick(v, date);
+                            }
                         }
                     } else if (date.getType() == 0) {//点击上月
+                        calendarView.setLastClickDay(day);
                         calendarView.lastMonth();
+                        if (clickListener != null) {
+                            clickListener.onMonthItemClick(v, date);
+                        }
                     } else if (date.getType() == 2) {//点击下月
+                        calendarView.setLastClickDay(day);
                         calendarView.nextMonth();
-                    }
-
-                    if (listener != null) {
-                        listener.onMonthItemClick(v, date, flag);
+                        if (clickListener != null) {
+                            clickListener.onMonthItemClick(v, date);
+                        }
                     }
                 }
             });
@@ -263,7 +274,8 @@ public class MonthView extends ViewGroup {
 
         for (int i = 0; i < getChildCount(); i++) {
             View childView = getChildAt(i);
-            childView.measure(MeasureSpec.makeMeasureSpec(itemWidth, MeasureSpec.EXACTLY), MeasureSpec.makeMeasureSpec(itemHeight, MeasureSpec.EXACTLY));
+            childView.measure(MeasureSpec.makeMeasureSpec(itemWidth, MeasureSpec.EXACTLY),
+                    MeasureSpec.makeMeasureSpec(itemHeight, MeasureSpec.EXACTLY));
         }
     }
 
@@ -319,6 +331,7 @@ public class MonthView extends ViewGroup {
         //防止造成默认日期取消后代码重复选中的假象
         if (chooseDays.contains(dateInit[2]) && !set.contains(dateInit[2])) {
             setDayColor(findDestView(dateInit[2]), COLOR_RESET);
+            chooseDays.remove(dateInit[2]);
         }
         invalidate();
     }

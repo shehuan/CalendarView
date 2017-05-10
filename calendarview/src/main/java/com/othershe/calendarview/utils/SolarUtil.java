@@ -5,8 +5,6 @@ import android.text.TextUtils;
 import java.util.Calendar;
 
 public class SolarUtil {
-    //母亲节5月的第二个星期日。父亲节6月的第三个星期日
-
     /**
      * 计算阳历节日
      *
@@ -88,6 +86,14 @@ public class SolarUtil {
         return holiday;
     }
 
+    /**
+     * 计算母亲节、父亲节是几号
+     *
+     * @param year
+     * @param month
+     * @param delta
+     * @return
+     */
     private static int motherFatherDay(int year, int month, int delta) {
         int f = getFirstWeekOfMonth(year, month - 1);
         f = f == 0 ? 7 : f;
