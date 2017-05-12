@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <declare-styleable name="CalendarView">
-        <!--是否多选-->
-        <attr name="multi_choose" format="boolean" />
         <!--是否显示农历-->
         <attr name="show_lunar" format="boolean" />
         <!--是否显示上月和下月-->

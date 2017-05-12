@@ -330,7 +330,7 @@ public class MonthView extends ViewGroup {
             chooseDays.add(day);
         }
         //防止造成默认日期取消后代码重复选中的假象
-        if (chooseDays.contains(dateInit[2]) && !set.contains(dateInit[2])) {
+        if (chooseDays.contains(dateInit[2]) && (!set.contains(dateInit[2]) || set.isEmpty())) {
             setDayColor(findDestView(dateInit[2]), COLOR_RESET);
             chooseDays.remove(dateInit[2]);
         }
