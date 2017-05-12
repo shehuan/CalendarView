@@ -9,13 +9,13 @@
 * 6、通过自定义属性定制日期外观，以及简单的日期item布局配置
 
 #### [基本原理介绍](http://www.jianshu.com/p/304c8e70d0bd)    
-#### [demo下载](https://fir.im/u8p4?release_id=591512a8ca87a86f06000163)
+#### [demo下载](https://fir.im/vehj?release_id=59154975ca87a8790e00015b)
 
 ### 效果图：
 
 ![](https://github.com/Othershe/CalendarView/blob/master/screenshot/1.gif)
-![](https://github.com/Othershe/CalendarView/blob/master/screenshot/3.gif) 
 ![](https://github.com/Othershe/CalendarView/blob/master/screenshot/2.gif)
+![](https://github.com/Othershe/CalendarView/blob/master/screenshot/3.gif)
 
 ### 基本用法：
 **Step 1. 添加JitPack仓库**
