@@ -7,7 +7,9 @@
 * 4、单选、多选
 * 5、跳转到指定日期
 * 6、通过自定义属性定制日期外观，以及简单的日期item布局配置
-* 7、[基本原理介绍](http://www.jianshu.com/p/304c8e70d0bd)
+
+#### [基本原理介绍](http://www.jianshu.com/p/304c8e70d0bd)    
+#### [demo下载](https://fir.im/u8p4?release_id=591512a8ca87a86f06000163)
 
 ### 效果图：
 
