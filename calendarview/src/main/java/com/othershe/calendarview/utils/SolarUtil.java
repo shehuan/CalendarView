@@ -14,7 +14,7 @@ public class SolarUtil {
      * @return
      */
     public static String getSolarHoliday(int year, int month, int day) {
-        int md = (int) (month * Math.pow(10, day > 10 ? 2 : 1));
+        int md = (int) (month * Math.pow(10, day > 10 ? 2 : 1) + day);
         String holiday = "";
         switch (md) {
             case 11:
