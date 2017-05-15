@@ -306,14 +306,14 @@ public class MonthView extends ViewGroup {
         }
     }
 
-    public void refresh(int day) {
-        View destView = findDestView(day);
-        if (destView == null) {
-            return;
-        }
+    public void refresh(int day, boolean flag) {
         if (lastClickedView != null) {
             setDayColor(lastClickedView, COLOR_RESET);
         }
+        if (!flag){
+            return;
+        }
+        View destView = findDestView(day);
         setDayColor(destView, COLOR_SET);
         lastClickedView = destView;
         invalidate();

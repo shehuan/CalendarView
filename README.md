@@ -103,20 +103,21 @@ calendarView.setOnMonthItemChooseListener(new OnMonthItemChooseListener() {
 ### CalendarView的自定义属性
 namespace：xmlns:calendarview="http://schemas.android.com/apk/res-auto"
 
-|属性名|格式|描述
-|---|---|---|
-|show_lunar|boolean|是否显示农历
-|show_last_next|boolean|是否在MonthView显示上月和下月日期
-|show_holiday|boolean|是否显示节假日
-|show_term|boolean|是否显示节气
-|date_start|string|日历的开始年月（例如：1990.5）
-|date_end|string|日历的结束年月（例如：2025.12）
+|属性名|格式|描述|默认值
+|---|---|---|---|
+|show_lunar|boolean|是否显示农历|true
+|show_last_next|boolean|是否在MonthView显示上月和下月日期|true
+|show_holiday|boolean|是否显示节假日|true
+|show_term|boolean|是否显示节气|true
+|date_start|string|日历的开始年月（例如：1990.5）|1900.1
+|date_end|string|日历的结束年月（例如：2025.12）|2049.12
 |date_init|string|日历默认展示、选中的日期(例如：2017.5.20)，不设置则为当天
-|disable_before|boolean|默认展示、选中的日期前的所有日期是否可用
+|disable_before|boolean|是否禁用默认选中日期前的所有日期|false
+|switch_choose|boolean|单选时切换月份，是否选中上次的日期|true
 |color_solar|color|阳历日期的颜色
-|size_solar|integer|阳历的日期尺寸
+|size_solar|integer|阳历的日期尺寸|14
 |color_lunar|color|农历的日期颜色
-|size_lunar|integer|农历的日期尺寸
+|size_lunar|integer|农历的日期尺寸|8
 |color_holiday|color|节假日、节气的颜色
 |color_choose|color|选中的日期颜色
 |day_bg|reference|选中的日期背景(图片)
@@ -124,8 +125,8 @@ namespace：xmlns:calendarview="http://schemas.android.com/apk/res-auto"
 ### WeekView的自定义属性
 namespace：xmlns:weekview="http://schemas.android.com/apk/res-auto"
 
-|属性名|格式|描述
-|---|---|---|
+|属性名|格式|描述|默认值
+|---|---|---|---|
 |week_str|string|周的表示形式，用点隔开（例如：日.一.二.三.四.五.六）
 |week_color|color|周的颜色
-|week_size|integer|周的尺寸
+|week_size|integer|周的尺寸|12

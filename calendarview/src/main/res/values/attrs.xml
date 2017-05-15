@@ -15,7 +15,7 @@
         <attr name="date_end" format="string" />
         <!--默认展示、选中的日期(xxxx.x.x)-->
         <attr name="date_init" format="string" />
-        <!--默认展示、选中的日期前的所有日期是否可用-->
+        <!--是否禁用默认选中日期前的所有日期-->
         <attr name="disable_before" format="boolean" />
         <!--阳历的日期颜色-->
         <attr name="color_solar" format="color" />
@@ -31,6 +31,8 @@
         <attr name="color_choose" format="color" />
         <!--选中的日期背景-->
         <attr name="day_bg" format="reference" />
+        <!--单选时切换月份，是否选中上次的日期-->
+        <attr name="switch_choose" format="boolean" />
     </declare-styleable>
 
     <declare-styleable name="WeekView">
