@@ -35,7 +35,7 @@ dependencies {
 }
 ```
 **Step 3. 在布局文件中添加WeekView、CalendarView**
-```
+```java
 <com.othershe.calendarview.WeekView
         android:layout_width="match_parent"
         android:layout_height="35dp" />
@@ -46,7 +46,7 @@ dependencies {
         android:layout_height="wrap_content" />
 ```
 **Step 4. 相关初始化**
-```
+```java
 CalendarView calendarView = (CalendarView) findViewById(R.id.calendar);
 //日历init
 calendarView.init();
