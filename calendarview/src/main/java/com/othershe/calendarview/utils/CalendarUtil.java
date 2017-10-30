@@ -8,6 +8,7 @@ import com.othershe.calendarview.DateBean;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class CalendarUtil {
     /**
@@ -17,7 +18,7 @@ public class CalendarUtil {
      * @param month 当前月份
      * @return
      */
-    public static List<DateBean> getMonthDate(int year, int month) {
+    public static List<DateBean> getMonthDate(int year, int month, Map<String, String> map) {
         List<DateBean> datas = new ArrayList<>();
         int week = SolarUtil.getFirstWeekOfMonth(year, month - 1);
 
@@ -45,30 +46,38 @@ public class CalendarUtil {
         }
 
         for (int i = 0; i < week; i++) {
-            datas.add(initDateBean(lastYear, lastMonth, lastMonthDays - week + 1 + i, 0));
+            datas.add(initDateBean(lastYear, lastMonth, lastMonthDays - week + 1 + i, 0, map));
         }
 
         for (int i = 0; i < currentMonthDays; i++) {
-            datas.add(initDateBean(year, month, i + 1, 1));
+            datas.add(initDateBean(year, month, i + 1, 1, map));
         }
 
         for (int i = 0; i < 7 * getMonthRows(year, month) - currentMonthDays - week; i++) {
-            datas.add(initDateBean(nextYear, nextMonth, i + 1, 2));
+            datas.add(initDateBean(nextYear, nextMonth, i + 1, 2, map));
         }
 
         return datas;
     }
 
-    private static DateBean initDateBean(int year, int month, int day, int type) {
+    private static DateBean initDateBean(int year, int month, int day, int type, Map<String, String> map) {
         DateBean dateBean = new DateBean();
         dateBean.setSolar(year, month, day);
 
-        String[] temp = LunarUtil.solarToLunar(year, month, day);
+        if (map == null) {
+            String[] temp = LunarUtil.solarToLunar(year, month, day);
+            dateBean.setLunar(new String[]{temp[0], temp[1]});
+            dateBean.setLunarHoliday(temp[2]);
+        } else {
+            if (map.containsKey(year + "." + month + "." + day)) {
+                dateBean.setLunar(new String[]{"", map.get(year + "." + month + "." + day), ""});
+            } else {
+                dateBean.setLunar(new String[]{"", "", ""});
+            }
+        }
 
-        dateBean.setLunar(new String[]{temp[0], temp[1]});
         dateBean.setType(type);
         dateBean.setTerm(LunarUtil.getTermString(year, month - 1, day));
-        dateBean.setLunarHoliday(temp[2]);
 
         if (type == 0) {
             dateBean.setSolarHoliday(SolarUtil.getSolarHoliday(year, month, day - 1));
@@ -79,7 +88,7 @@ public class CalendarUtil {
     }
 
     public static DateBean getDateBean(int year, int month, int day) {
-        return initDateBean(year, month, day, 1);
+        return initDateBean(year, month, day, 1, null);
     }
 
     /**

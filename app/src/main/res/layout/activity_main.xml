@@ -46,9 +46,13 @@
     <com.othershe.calendarview.CalendarView
         android:id="@+id/calendar"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="220dp"
         calendarview:date_end="2020.12"
-        calendarview:date_start="1990.1" />
+        calendarview:date_start="1990.1"
+        calendarview:show_holiday="false"
+        calendarview:show_lunar="true"
+        calendarview:show_term="false"
+        calendarview:switch_choose="false" />
 
     <LinearLayout
         android:layout_width="match_parent"

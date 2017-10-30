@@ -18,6 +18,8 @@ import com.othershe.calendarview.listener.CalendarViewAdapter;
 import com.othershe.calendarview.listener.OnMonthItemClickListener;
 import com.othershe.calendarview.listener.OnPagerChangeListener;
 
+import java.util.HashMap;
+
 public class MainActivity extends AppCompatActivity {
 
     private CalendarView calendarView;
@@ -28,7 +30,17 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         final TextView title = (TextView) findViewById(R.id.title);
         calendarView = (CalendarView) findViewById(R.id.calendar);
-        calendarView.init();
+        HashMap<String, String> map = new HashMap<>();
+        map.put("2017.10.30", "qaz");
+        map.put("2017.10.1", "wsx");
+        map.put("2017.11.12", "yhn");
+        map.put("2017.9.15", "edc");
+        map.put("2017.11.6", "rfv");
+        map.put("2017.11.11", "tgb");
+        calendarView.
+                setSpecifyMap(map)
+                .setDateInit("", false)
+                .init();
 //        calendarView.setOnCalendarViewAdapter(R.layout.item_layout, new CalendarViewAdapter() {
 //            @Override
 //            public TextView[] convertView(View view, DateBean date) {

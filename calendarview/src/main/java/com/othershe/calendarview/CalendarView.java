@@ -14,7 +14,9 @@ import com.othershe.calendarview.listener.OnPagerChangeListener;
 import com.othershe.calendarview.utils.CalendarUtil;
 import com.othershe.calendarview.utils.SolarUtil;
 
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 
 public class CalendarView extends ViewPager {
     //记录当前PagerAdapter的position
@@ -43,6 +45,9 @@ public class CalendarView extends ViewPager {
     private int sizeLunar = 8;//阴历日期文字尺寸
     private int dayBg = R.drawable.blue_circle;//选中的背景
 
+    private Map<String, String> mSpecifyMap;//指定日期对应的文字map
+    private boolean showDateInit = true;//是否标记默认日期
+
     private int count;//ViewPager的页数
     private int[] lastClickDate = new int[2];//上次点击的日期
     private SparseArray<HashSet<Integer>> chooseDate = new SparseArray<>();//记录多选时全部选中的日期
@@ -59,20 +64,10 @@ public class CalendarView extends ViewPager {
     }
 
     private void initAttr(Context context, AttributeSet attrs) {
-        String dateStartStr = null;
-        String dateEndStr = null;
-        String dateInitStr = null;
-
         TypedArray ta = context.obtainStyledAttributes(attrs, R.styleable.CalendarView);
         for (int i = 0; i < ta.getIndexCount(); i++) {
             int attr = ta.getIndex(i);
-            if (attr == R.styleable.CalendarView_date_start) {
-                dateStartStr = ta.getString(attr);
-            } else if (attr == R.styleable.CalendarView_date_end) {
-                dateEndStr = ta.getString(attr);
-            } else if (attr == R.styleable.CalendarView_date_init) {
-                dateInitStr = ta.getString(attr);
-            } else if (attr == R.styleable.CalendarView_show_last_next) {
+            if (attr == R.styleable.CalendarView_show_last_next) {
                 showLastNext = ta.getBoolean(attr, true);
             } else if (attr == R.styleable.CalendarView_show_lunar) {
                 showLunar = ta.getBoolean(attr, true);
@@ -103,30 +98,20 @@ public class CalendarView extends ViewPager {
 
         ta.recycle();
 
-        dateStart = CalendarUtil.strToArray(dateStartStr);
-        if (dateStart == null) {
-            dateStart = new int[]{1900, 1};
-        }
-        dateEnd = CalendarUtil.strToArray(dateEndStr);
-        if (dateEnd == null) {
-            dateEnd = new int[]{2049, 12};
-        }
-
-        dateInit = CalendarUtil.strToArray(dateInitStr);
-        if (dateInit == null) {
-            dateInit = SolarUtil.getCurrentDate();
-        }
-
         sizeSolar = CalendarUtil.getTextSize(context, sizeSolar);
         sizeLunar = CalendarUtil.getTextSize(context, sizeLunar);
+
+        dateStart = new int[]{1900, 1};
+        dateEnd = new int[]{2049, 12};
+        dateInit = SolarUtil.getCurrentDate();
     }
 
     public void init() {
         //根据设定的日期范围计算日历的页数
         count = (dateEnd[0] - dateStart[0]) * 12 + dateEnd[1] - dateStart[1] + 1;
-        calendarPagerAdapter = new CalendarPagerAdapter(count);
+        calendarPagerAdapter = new CalendarPagerAdapter(count, mSpecifyMap);
         calendarPagerAdapter.setAttrValues(dateInit, dateStart,
-                showLastNext, showLunar, showHoliday, showTerm, disableBefore,
+                showLastNext, showLunar, showHoliday, showTerm, disableBefore, showDateInit,
                 colorSolar, colorLunar, colorHoliday, colorChoose,
                 sizeSolar, sizeLunar, dayBg);
 
@@ -352,5 +337,47 @@ public class CalendarView extends ViewPager {
      */
     public DateBean getDateInit() {
         return CalendarUtil.getDateBean(dateInit[0], dateInit[1], dateInit[2]);
+    }
+
+    /**
+     * 将指定日期的农历替换成对应文字
+     */
+    public CalendarView setSpecifyMap(HashMap<String, String> map) {
+        mSpecifyMap = map;
+        return this;
+    }
+
+    /**
+     * 设置初始选中的日期，是否标记默认日期
+     *
+     * @param dateStr
+     * @return
+     */
+    public CalendarView setDateInit(String dateStr, boolean showDateInit) {
+        dateInit = CalendarUtil.strToArray(dateStr);
+        if (dateInit == null) {
+            dateInit = SolarUtil.getCurrentDate();
+        }
+        this.showDateInit = showDateInit;
+        return this;
+    }
+
+    /**
+     * 设置日历的开始年月、结束年月
+     *
+     * @param dateStart
+     * @param dateEnd
+     * @return
+     */
+    public CalendarView setDateStartEnd(String dateStart, String dateEnd) {
+        this.dateStart = CalendarUtil.strToArray(dateStart);
+        if (dateStart == null) {
+            this.dateStart = new int[]{1900, 1};
+        }
+        this.dateEnd = CalendarUtil.strToArray(dateEnd);
+        if (dateEnd == null) {
+            this.dateEnd = new int[]{2049, 12};
+        }
+        return this;
     }
 }

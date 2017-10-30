@@ -45,6 +45,7 @@ public class MonthView extends ViewGroup {
     private int sizeLunar;
     private int dayBg;
     private int[] dateInit;
+    private boolean showDateInit;
 
     private int item_layout;
     private CalendarViewAdapter calendarViewAdapter;
@@ -135,15 +136,21 @@ public class MonthView extends ViewGroup {
                     } else if (!TextUtils.isEmpty(date.getTerm()) && showTerm) {//节气
                         setLunarText(date.getTerm(), lunarDay, date.getType());
                     } else {
-                        lunarDay.setText(date.getLunar()[1]);//农历日期
+                        if (TextUtils.isEmpty(date.getLunar()[1])) {
+                            lunarDay.setVisibility(GONE);
+                        } else {
+                            lunarDay.setText(date.getLunar()[1]);//农历日期
+                        }
                     }
                 }
+
             } else {
                 lunarDay.setVisibility(GONE);
             }
 
+
             //默认选中当天
-            if (!findInitShowDay
+            if (showDateInit && !findInitShowDay
                     && date.getType() == 1
                     && dateInit[0] == date.getSolar()[0]
                     && dateInit[1] == date.getSolar()[1]
@@ -256,26 +263,24 @@ public class MonthView extends ViewGroup {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
 
         int widthSpecSize = MeasureSpec.getSize(widthMeasureSpec);
+        int heightSpecSize = MeasureSpec.getSize(heightMeasureSpec);
 
-        int itemWidth = widthSpecSize / COLUMN;// - 14
+        int itemWidth = widthSpecSize / COLUMN;
 
-        int width = widthSpecSize;
-        int height = itemWidth * ROW;
+        //计算日历的最大高度
+        if (heightSpecSize > itemWidth * ROW) {
+            heightSpecSize = itemWidth * ROW;
+        }
 
-        setMeasuredDimension(width, height);
+        setMeasuredDimension(widthSpecSize, heightSpecSize);
 
-        int itemHeight;
+        int itemHeight = heightSpecSize / ROW;
 
-//        if (getChildCount() == 35) {
-//            itemHeight = getMeasuredHeight() / 5;
-//        } else {
-        itemHeight = itemWidth;
-//        }
-
+        int itemSize = Math.min(itemWidth, itemHeight);
         for (int i = 0; i < getChildCount(); i++) {
             View childView = getChildAt(i);
-            childView.measure(MeasureSpec.makeMeasureSpec(itemWidth, MeasureSpec.EXACTLY),
-                    MeasureSpec.makeMeasureSpec(itemHeight, MeasureSpec.EXACTLY));
+            childView.measure(MeasureSpec.makeMeasureSpec(itemSize, MeasureSpec.EXACTLY),
+                    MeasureSpec.makeMeasureSpec(itemSize, MeasureSpec.EXACTLY));
         }
     }
 
@@ -288,17 +293,19 @@ public class MonthView extends ViewGroup {
         View childView = getChildAt(0);
         int itemWidth = childView.getMeasuredWidth();
         int itemHeight = childView.getMeasuredHeight();
+        //计算列间距
+        int dx = (getMeasuredWidth() - itemWidth * COLUMN) / (COLUMN * 2);
 
         //当显示五行时扩大行间距
         int dy = 0;
         if (getChildCount() == 35) {
-            dy = itemWidth / 5;
+            dy = itemHeight / 5;
         }
 
         for (int i = 0; i < getChildCount(); i++) {
             View view = getChildAt(i);
 
-            int left = i % COLUMN * itemWidth;// + (2 * (i % COLUMN) + 1) * 7
+            int left = i % COLUMN * itemWidth + ((2 * (i % COLUMN) + 1)) * dx;
             int top = i / COLUMN * (itemHeight + dy);
             int right = left + itemWidth;
             int bottom = top + itemHeight;
@@ -309,8 +316,10 @@ public class MonthView extends ViewGroup {
     public void refresh(int day, boolean flag) {
         if (lastClickedView != null) {
             setDayColor(lastClickedView, COLOR_RESET);
+        } else {
+            return;
         }
-        if (!flag){
+        if (!flag) {
             return;
         }
         View destView = findDestView(day);
@@ -363,7 +372,8 @@ public class MonthView extends ViewGroup {
     }
 
     public void setAttrValues(int[] dateInit,
-                              boolean showLastNext, boolean showLunar, boolean showHoliday, boolean showTerm, boolean disableBefore,
+                              boolean showLastNext, boolean showLunar, boolean showHoliday,
+                              boolean showTerm, boolean disableBefore, boolean showDateInit,
                               int colorSolar, int colorLunar, int colorHoliday, int colorChoose,
                               int sizeSolar, int sizeLunar, int dayBg) {
         this.dateInit = dateInit;
@@ -379,6 +389,7 @@ public class MonthView extends ViewGroup {
         this.sizeSolar = sizeSolar;
         this.sizeLunar = sizeLunar;
         this.dayBg = dayBg;
+        this.showDateInit = showDateInit;
     }
 
     public void setOnCalendarViewAdapter(int item_layout, CalendarViewAdapter calendarViewAdapter) {
