@@ -1,12 +1,14 @@
-package com.othershe.calendarview;
+package com.othershe.calendarview.weiget;
 
 import android.content.Context;
 import android.content.res.TypedArray;
-import android.graphics.Color;
 import android.support.v4.view.ViewPager;
 import android.util.AttributeSet;
 import android.util.SparseArray;
 
+import com.othershe.calendarview.R;
+import com.othershe.calendarview.bean.AttrsBean;
+import com.othershe.calendarview.bean.DateBean;
 import com.othershe.calendarview.listener.CalendarViewAdapter;
 import com.othershe.calendarview.listener.OnMonthItemChooseListener;
 import com.othershe.calendarview.listener.OnMonthItemClickListener;
@@ -14,9 +16,10 @@ import com.othershe.calendarview.listener.OnPagerChangeListener;
 import com.othershe.calendarview.utils.CalendarUtil;
 import com.othershe.calendarview.utils.SolarUtil;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
+import java.util.List;
 
 public class CalendarView extends ViewPager {
     //记录当前PagerAdapter的position
@@ -31,28 +34,16 @@ public class CalendarView extends ViewPager {
     private int[] dateStart;//日历的开始年、月
     private int[] dateEnd;//日历的结束年、月
     private int[] dateInit;//默认展示、选中的日期（年、月、日）
-    private boolean showLastNext = true;//是否显示上个月、下个月
-    private boolean showLunar = true;//是否显示农历
-    private boolean showHoliday = true;//是否显示节假日(不显示农历则节假日无法显示，节假日会覆盖农历显示)
-    private boolean showTerm = true;//是否显示节气
-    private boolean disableBefore = false;//是否禁用默认选中日期前的所有日期
-    private boolean switchChoose = true;//单选时切换月份，是否选中上次的日期
-    private int colorSolar = Color.BLACK;//阳历的日期颜色
-    private int colorLunar = Color.parseColor("#999999");//阴历的日期颜色
-    private int colorHoliday = Color.parseColor("#EC9729");//节假日的颜色
-    private int colorChoose = Color.WHITE;//选中的日期文字颜色
-    private int sizeSolar = 14;//阳历日期文字尺寸
-    private int sizeLunar = 8;//阴历日期文字尺寸
-    private int dayBg = R.drawable.blue_circle;//选中的背景
-
-    private Map<String, String> mSpecifyMap;//指定日期对应的文字map
-    private boolean showDateInit = true;//是否标记默认日期
 
     private int count;//ViewPager的页数
     private int[] lastClickDate = new int[2];//上次点击的日期
     private SparseArray<HashSet<Integer>> chooseDate = new SparseArray<>();//记录多选时全部选中的日期
 
+    private List<int[]> multiDateInitList;
+
     private CalendarPagerAdapter calendarPagerAdapter;
+
+    private AttrsBean mAttrsBean;
 
     public CalendarView(Context context) {
         this(context, null);
@@ -60,6 +51,7 @@ public class CalendarView extends ViewPager {
 
     public CalendarView(Context context, AttributeSet attrs) {
         super(context, attrs);
+        mAttrsBean = new AttrsBean();
         initAttr(context, attrs);
     }
 
@@ -68,53 +60,63 @@ public class CalendarView extends ViewPager {
         for (int i = 0; i < ta.getIndexCount(); i++) {
             int attr = ta.getIndex(i);
             if (attr == R.styleable.CalendarView_show_last_next) {
-                showLastNext = ta.getBoolean(attr, true);
+//                showLastNext = ta.getBoolean(attr, true);
+                mAttrsBean.setShowLastNext(ta.getBoolean(attr, true));
             } else if (attr == R.styleable.CalendarView_show_lunar) {
-                showLunar = ta.getBoolean(attr, true);
+//                showLunar = ta.getBoolean(attr, true);
+                mAttrsBean.setShowLunar(ta.getBoolean(attr, true));
             } else if (attr == R.styleable.CalendarView_show_holiday) {
-                showHoliday = ta.getBoolean(attr, true);
+//                showHoliday = ta.getBoolean(attr, true);
+                mAttrsBean.setShowHoliday(ta.getBoolean(attr, true));
             } else if (attr == R.styleable.CalendarView_show_term) {
-                showTerm = ta.getBoolean(attr, true);
+//                showTerm = ta.getBoolean(attr, true);
+                mAttrsBean.setShowTerm(ta.getBoolean(attr, true));
             } else if (attr == R.styleable.CalendarView_disable_before) {
-                disableBefore = ta.getBoolean(attr, false);
+//                disableBefore = ta.getBoolean(attr, false);
+                mAttrsBean.setDisableBefore(ta.getBoolean(attr, false));
             } else if (attr == R.styleable.CalendarView_switch_choose) {
-                switchChoose = ta.getBoolean(attr, true);
+//                switchChoose = ta.getBoolean(attr, true);
+                mAttrsBean.setSwitchChoose(ta.getBoolean(attr, true));
             } else if (attr == R.styleable.CalendarView_color_solar) {
-                colorSolar = ta.getColor(attr, colorSolar);
+//                colorSolar = ta.getColor(attr, colorSolar);
+                mAttrsBean.setColorSolar(ta.getColor(attr, mAttrsBean.getColorSolar()));
             } else if (attr == R.styleable.CalendarView_size_solar) {
-                sizeSolar = ta.getInteger(R.styleable.CalendarView_size_solar, sizeSolar);
+//                sizeSolar = ta.getInteger(R.styleable.CalendarView_size_solar, sizeSolar);
+                mAttrsBean.setSizeSolar(CalendarUtil.getTextSize(context, ta.getInteger(R.styleable.CalendarView_size_solar, mAttrsBean.getSizeSolar())));
             } else if (attr == R.styleable.CalendarView_color_lunar) {
-                colorLunar = ta.getColor(attr, colorLunar);
+//                colorLunar = ta.getColor(attr, colorLunar);
+                mAttrsBean.setColorLunar(ta.getColor(attr, mAttrsBean.getColorLunar()));
             } else if (attr == R.styleable.CalendarView_size_lunar) {
-                sizeLunar = ta.getDimensionPixelSize(R.styleable.CalendarView_size_lunar, sizeLunar);
+//                sizeLunar = ta.getDimensionPixelSize(R.styleable.CalendarView_size_lunar, sizeLunar);
+                mAttrsBean.setSizeLunar(CalendarUtil.getTextSize(context, ta.getDimensionPixelSize(R.styleable.CalendarView_size_lunar, mAttrsBean.getSizeLunar())));
             } else if (attr == R.styleable.CalendarView_color_holiday) {
-                colorHoliday = ta.getColor(attr, colorHoliday);
+//                colorHoliday = ta.getColor(attr, colorHoliday);
+                mAttrsBean.setColorHoliday(ta.getColor(attr, mAttrsBean.getColorHoliday()));
             } else if (attr == R.styleable.CalendarView_color_choose) {
-                colorChoose = ta.getColor(attr, colorChoose);
+//                colorChoose = ta.getColor(attr, colorChoose);
+                mAttrsBean.setColorChoose(ta.getColor(attr, mAttrsBean.getColorChoose()));
             } else if (attr == R.styleable.CalendarView_day_bg) {
-                dayBg = ta.getResourceId(attr, dayBg);
+//                dayBg = ta.getResourceId(attr, dayBg);
+                mAttrsBean.setDayBg(ta.getResourceId(attr, mAttrsBean.getDayBg()));
             }
         }
 
         ta.recycle();
 
-        sizeSolar = CalendarUtil.getTextSize(context, sizeSolar);
-        sizeLunar = CalendarUtil.getTextSize(context, sizeLunar);
-
         dateStart = new int[]{1900, 1};
         dateEnd = new int[]{2049, 12};
         dateInit = SolarUtil.getCurrentDate();
+
+        mAttrsBean.setDateStart(dateStart);
+        mAttrsBean.setDateEnd(dateEnd);
+        mAttrsBean.setDateInit(dateInit);
     }
 
     public void init() {
         //根据设定的日期范围计算日历的页数
         count = (dateEnd[0] - dateStart[0]) * 12 + dateEnd[1] - dateStart[1] + 1;
-        calendarPagerAdapter = new CalendarPagerAdapter(count, mSpecifyMap);
-        calendarPagerAdapter.setAttrValues(dateInit, dateStart,
-                showLastNext, showLunar, showHoliday, showTerm, disableBefore, showDateInit,
-                colorSolar, colorLunar, colorHoliday, colorChoose,
-                sizeSolar, sizeLunar, dayBg);
-
+        calendarPagerAdapter = new CalendarPagerAdapter(count);
+        calendarPagerAdapter.setAttrsBean(mAttrsBean);
         calendarPagerAdapter.setOnCalendarViewAdapter(item_layout, calendarViewAdapter);
 
         setAdapter(calendarPagerAdapter);
@@ -170,7 +172,7 @@ public class CalendarView extends ViewPager {
             if (chooseDate.get(position) != null)
                 monthView.multiChooseRefresh(chooseDate.get(position));
         } else {
-            boolean flag = (!switchChoose && lastClickDate[0] == position) || switchChoose;
+            boolean flag = (!mAttrsBean.isSwitchChoose() && lastClickDate[0] == position) || mAttrsBean.isSwitchChoose();
             monthView.refresh(lastClickDate[1], flag);
         }
     }
@@ -275,7 +277,7 @@ public class CalendarView extends ViewPager {
      */
     public void toSpecifyDate(int year, int month, int day) {
         int destPosition = CalendarUtil.dateToPosition(year, month, dateStart[0], dateStart[1]);
-        if (!switchChoose && day != 0) {
+        if (!mAttrsBean.isSwitchChoose() && day != 0) {
             lastClickDate[0] = destPosition;
         }
         lastClickDate[1] = day != 0 ? day : lastClickDate[1];
@@ -343,7 +345,7 @@ public class CalendarView extends ViewPager {
      * 将指定日期的农历替换成对应文字
      */
     public CalendarView setSpecifyMap(HashMap<String, String> map) {
-        mSpecifyMap = map;
+        mAttrsBean.setSpecifyMap(map);
         return this;
     }
 
@@ -358,7 +360,8 @@ public class CalendarView extends ViewPager {
         if (dateInit == null) {
             dateInit = SolarUtil.getCurrentDate();
         }
-        this.showDateInit = showDateInit;
+        mAttrsBean.setDateInit(dateInit);
+        mAttrsBean.setShowDateInit(showDateInit);
         return this;
     }
 
@@ -377,6 +380,22 @@ public class CalendarView extends ViewPager {
         this.dateEnd = CalendarUtil.strToArray(dateEnd);
         if (dateEnd == null) {
             this.dateEnd = new int[]{2049, 12};
+        }
+        mAttrsBean.setDateStart(this.dateStart);
+        mAttrsBean.setDateEnd(this.dateEnd);
+        return this;
+    }
+
+    /**
+     * 设置多选时默认选中的日期集合
+     *
+     * @param dates
+     * @return
+     */
+    public CalendarView setMultiDateInit(List<String> dates) {
+        multiDateInitList = new ArrayList<>();
+        for (String date : dates) {
+            multiDateInitList.add(CalendarUtil.strToArray(date));
         }
         return this;
     }

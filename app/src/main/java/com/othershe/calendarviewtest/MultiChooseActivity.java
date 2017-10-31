@@ -5,8 +5,8 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
 
-import com.othershe.calendarview.CalendarView;
-import com.othershe.calendarview.DateBean;
+import com.othershe.calendarview.weiget.CalendarView;
+import com.othershe.calendarview.bean.DateBean;
 import com.othershe.calendarview.listener.OnMonthItemChooseListener;
 import com.othershe.calendarview.listener.OnPagerChangeListener;
 

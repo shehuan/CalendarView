@@ -1,4 +1,4 @@
-package com.othershe.calendarview;
+package com.othershe.calendarview.weiget;
 
 import android.content.Context;
 import android.content.res.TypedArray;
@@ -9,6 +9,7 @@ import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.view.View;
 
+import com.othershe.calendarview.R;
 import com.othershe.calendarview.utils.CalendarUtil;
 
 public class WeekView extends View {

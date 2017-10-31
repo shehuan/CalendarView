@@ -1,4 +1,4 @@
-package com.othershe.calendarview;
+package com.othershe.calendarview.bean;
 
 public class DateBean {
     private int[] solar;//阳历年、月、日

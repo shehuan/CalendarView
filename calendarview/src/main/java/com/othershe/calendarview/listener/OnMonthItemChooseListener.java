@@ -2,7 +2,7 @@ package com.othershe.calendarview.listener;
 
 import android.view.View;
 
-import com.othershe.calendarview.DateBean;
+import com.othershe.calendarview.bean.DateBean;
 
 /**
  * 多选接口
