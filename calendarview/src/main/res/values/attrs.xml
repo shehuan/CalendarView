@@ -9,12 +9,12 @@
         <attr name="show_holiday" format="boolean" />
         <!--是否显示节气-->
         <attr name="show_term" format="boolean" />
-        <!--开始日期(xxxx.x)-->
-        <attr name="date_start" format="string" />
-        <!--结束日期(xxxx.x)-->
-        <attr name="date_end" format="string" />
-        <!--默认展示、选中的日期(xxxx.x.x)-->
-        <attr name="date_init" format="string" />
+        <!--&lt;!&ndash;开始日期(xxxx.x)&ndash;&gt;-->
+        <!--<attr name="date_start" format="string" />-->
+        <!--&lt;!&ndash;结束日期(xxxx.x)&ndash;&gt;-->
+        <!--<attr name="date_end" format="string" />-->
+        <!--&lt;!&ndash;默认展示、选中的日期(xxxx.x.x)&ndash;&gt;-->
+        <!--<attr name="date_init" format="string" />-->
         <!--是否禁用默认选中日期前的所有日期-->
         <attr name="disable_before" format="boolean" />
         <!--阳历的日期颜色-->

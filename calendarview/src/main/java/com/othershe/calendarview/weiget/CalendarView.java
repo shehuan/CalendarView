@@ -60,43 +60,30 @@ public class CalendarView extends ViewPager {
         for (int i = 0; i < ta.getIndexCount(); i++) {
             int attr = ta.getIndex(i);
             if (attr == R.styleable.CalendarView_show_last_next) {
-//                showLastNext = ta.getBoolean(attr, true);
                 mAttrsBean.setShowLastNext(ta.getBoolean(attr, true));
             } else if (attr == R.styleable.CalendarView_show_lunar) {
-//                showLunar = ta.getBoolean(attr, true);
                 mAttrsBean.setShowLunar(ta.getBoolean(attr, true));
             } else if (attr == R.styleable.CalendarView_show_holiday) {
-//                showHoliday = ta.getBoolean(attr, true);
                 mAttrsBean.setShowHoliday(ta.getBoolean(attr, true));
             } else if (attr == R.styleable.CalendarView_show_term) {
-//                showTerm = ta.getBoolean(attr, true);
                 mAttrsBean.setShowTerm(ta.getBoolean(attr, true));
             } else if (attr == R.styleable.CalendarView_disable_before) {
-//                disableBefore = ta.getBoolean(attr, false);
                 mAttrsBean.setDisableBefore(ta.getBoolean(attr, false));
             } else if (attr == R.styleable.CalendarView_switch_choose) {
-//                switchChoose = ta.getBoolean(attr, true);
                 mAttrsBean.setSwitchChoose(ta.getBoolean(attr, true));
             } else if (attr == R.styleable.CalendarView_color_solar) {
-//                colorSolar = ta.getColor(attr, colorSolar);
                 mAttrsBean.setColorSolar(ta.getColor(attr, mAttrsBean.getColorSolar()));
             } else if (attr == R.styleable.CalendarView_size_solar) {
-//                sizeSolar = ta.getInteger(R.styleable.CalendarView_size_solar, sizeSolar);
-                mAttrsBean.setSizeSolar(CalendarUtil.getTextSize(context, ta.getInteger(R.styleable.CalendarView_size_solar, mAttrsBean.getSizeSolar())));
+                mAttrsBean.setSizeSolar(CalendarUtil.getTextSize(context, ta.getInteger(attr, mAttrsBean.getSizeSolar())));
             } else if (attr == R.styleable.CalendarView_color_lunar) {
-//                colorLunar = ta.getColor(attr, colorLunar);
                 mAttrsBean.setColorLunar(ta.getColor(attr, mAttrsBean.getColorLunar()));
             } else if (attr == R.styleable.CalendarView_size_lunar) {
-//                sizeLunar = ta.getDimensionPixelSize(R.styleable.CalendarView_size_lunar, sizeLunar);
-                mAttrsBean.setSizeLunar(CalendarUtil.getTextSize(context, ta.getDimensionPixelSize(R.styleable.CalendarView_size_lunar, mAttrsBean.getSizeLunar())));
+                mAttrsBean.setSizeLunar(CalendarUtil.getTextSize(context, ta.getInt(attr, mAttrsBean.getSizeLunar())));
             } else if (attr == R.styleable.CalendarView_color_holiday) {
-//                colorHoliday = ta.getColor(attr, colorHoliday);
                 mAttrsBean.setColorHoliday(ta.getColor(attr, mAttrsBean.getColorHoliday()));
             } else if (attr == R.styleable.CalendarView_color_choose) {
-//                colorChoose = ta.getColor(attr, colorChoose);
                 mAttrsBean.setColorChoose(ta.getColor(attr, mAttrsBean.getColorChoose()));
             } else if (attr == R.styleable.CalendarView_day_bg) {
-//                dayBg = ta.getResourceId(attr, dayBg);
                 mAttrsBean.setDayBg(ta.getResourceId(attr, mAttrsBean.getDayBg()));
             }
         }

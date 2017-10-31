@@ -2,9 +2,9 @@ package com.othershe.calendarviewtest;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,10 +12,10 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.othershe.calendarview.weiget.CalendarView;
 import com.othershe.calendarview.bean.DateBean;
 import com.othershe.calendarview.listener.OnMonthItemClickListener;
 import com.othershe.calendarview.listener.OnPagerChangeListener;
+import com.othershe.calendarview.weiget.CalendarView;
 
 import java.util.HashMap;
 
@@ -38,6 +38,7 @@ public class MainActivity extends AppCompatActivity {
         map.put("2017.11.11", "tgb");
         calendarView.
                 setSpecifyMap(map)
+                .setDateStartEnd("2010.7", "2018.12")
                 .setDateInit("", false)
                 .init();
 //        calendarView.setOnCalendarViewAdapter(R.layout.item_layout, new CalendarViewAdapter() {
