@@ -4,18 +4,21 @@ import android.graphics.Color;
 
 import com.othershe.calendarview.R;
 
+import java.util.List;
 import java.util.Map;
 
 public class AttrsBean {
 
-    private int[] dateStart;//日历的开始年、月
-    private int[] dateEnd;//日历的结束年、月
-    private int[] dateInit;//默认展示、选中的日期（年、月、日）
+    private int[] startDate;//日历的开始年、月
+    private int[] endDate;//日历的结束年、月
+    private int[] singleDate;//单选是默认选中的日期（年、月、日）
+    private List<int[]> multiDates;//多选时默认选中的日期集合
+    private int[] disableStartDate;//单选时默认选中的年、月、日disableStar
+    private int[] disableEndDate;//单选时默认选中的年、月、日
     private boolean showLastNext = true;//是否显示上个月、下个月
     private boolean showLunar = true;//是否显示农历
     private boolean showHoliday = true;//是否显示节假日(不显示农历则节假日无法显示，节假日会覆盖农历显示)
     private boolean showTerm = true;//是否显示节气
-    private boolean disableBefore = false;//是否禁用默认选中日期前的所有日期
     private boolean switchChoose = true;//单选时切换月份，是否选中上次的日期
     private int colorSolar = Color.BLACK;//阳历的日期颜色
     private int colorLunar = Color.parseColor("#999999");//阴历的日期颜色
@@ -25,30 +28,53 @@ public class AttrsBean {
     private int sizeLunar = 8;//阴历日期文字尺寸
     private int dayBg = R.drawable.blue_circle;//选中的背景
     private Map<String, String> specifyMap;//指定日期对应的文字map
-    private boolean showDateInit = true;//是否标记默认日期
 
-    public int[] getDateStart() {
-        return dateStart;
+    public int[] getStartDate() {
+        return startDate;
     }
 
-    public void setDateStart(int[] dateStart) {
-        this.dateStart = dateStart;
+    public void setStartDate(int[] startDate) {
+        this.startDate = startDate;
     }
 
-    public int[] getDateEnd() {
-        return dateEnd;
+    public int[] getEndDate() {
+        return endDate;
     }
 
-    public void setDateEnd(int[] dateEnd) {
-        this.dateEnd = dateEnd;
+    public void setEndDate(int[] endDate) {
+        this.endDate = endDate;
     }
 
-    public int[] getDateInit() {
-        return dateInit;
+    public int[] getSingleDate() {
+        return singleDate;
     }
 
-    public void setDateInit(int[] dateInit) {
-        this.dateInit = dateInit;
+    public void setSingleDate(int[] singleDate) {
+        this.singleDate = singleDate;
+    }
+
+    public List<int[]> getMultiDates() {
+        return multiDates;
+    }
+
+    public int[] getDisableStartDate() {
+        return disableStartDate;
+    }
+
+    public void setDisableStartDate(int[] disableStartDate) {
+        this.disableStartDate = disableStartDate;
+    }
+
+    public int[] getDisableEndDate() {
+        return disableEndDate;
+    }
+
+    public void setDisableEndDate(int[] disableEndDate) {
+        this.disableEndDate = disableEndDate;
+    }
+
+    public void setMultiDates(List<int[]> multiDates) {
+        this.multiDates = multiDates;
     }
 
     public boolean isShowLastNext() {
@@ -81,14 +107,6 @@ public class AttrsBean {
 
     public void setShowTerm(boolean showTerm) {
         this.showTerm = showTerm;
-    }
-
-    public boolean isDisableBefore() {
-        return disableBefore;
-    }
-
-    public void setDisableBefore(boolean disableBefore) {
-        this.disableBefore = disableBefore;
     }
 
     public boolean isSwitchChoose() {
@@ -161,13 +179,5 @@ public class AttrsBean {
 
     public void setSpecifyMap(Map<String, String> specifyMap) {
         this.specifyMap = specifyMap;
-    }
-
-    public boolean isShowDateInit() {
-        return showDateInit;
-    }
-
-    public void setShowDateInit(boolean showDateInit) {
-        this.showDateInit = showDateInit;
     }
 }

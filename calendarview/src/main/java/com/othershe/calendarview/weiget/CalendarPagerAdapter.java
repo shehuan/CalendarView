@@ -48,7 +48,7 @@ public class CalendarPagerAdapter extends PagerAdapter {
             view = new MonthView(container.getContext());
         }
         //根据position计算对应年、月
-        int[] date = CalendarUtil.positionToDate(position, mAttrsBean.getDateStart()[0], mAttrsBean.getDateStart()[1]);
+        int[] date = CalendarUtil.positionToDate(position, mAttrsBean.getStartDate()[0], mAttrsBean.getStartDate()[1]);
         view.setAttrsBean(mAttrsBean);
         view.setOnCalendarViewAdapter(item_layout, calendarViewAdapter);
         view.setDateList(CalendarUtil.getMonthDate(date[0], date[1], mAttrsBean.getSpecifyMap()), SolarUtil.getMonthDays(date[0], date[1]));

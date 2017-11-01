@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class CalendarView extends ViewPager {
     //记录当前PagerAdapter的position
@@ -31,15 +32,16 @@ public class CalendarView extends ViewPager {
     private CalendarViewAdapter calendarViewAdapter;
     private int item_layout;
 
-    private int[] dateStart;//日历的开始年、月
-    private int[] dateEnd;//日历的结束年、月
-    private int[] dateInit;//默认展示、选中的日期（年、月、日）
+    private int[] initDate;//日历初始显示的年月
+    private int[] startDate;//日历的开始年、月
+    private int[] endDate;//日历的结束年、月
+    private int[] singleDate;//单选时默认选中的年、月、日
+    private List<int[]> multiDates;//多选时默认选中的年、月、日
 
     private int count;//ViewPager的页数
-    private int[] lastClickDate = new int[2];//上次点击的日期
-    private SparseArray<HashSet<Integer>> chooseDate = new SparseArray<>();//记录多选时全部选中的日期
-
-    private List<int[]> multiDateInitList;
+    private int[] lastClickDate = new int[2];//记录单选的ViewPager position以及选中的日期
+    private SparseArray<HashSet<Integer>> chooseDate;//记录多选时全部选中的日期
+    private Set<Integer> positions;//多选时记录选中日期对应的ViewPager position
 
     private CalendarPagerAdapter calendarPagerAdapter;
 
@@ -67,21 +69,19 @@ public class CalendarView extends ViewPager {
                 mAttrsBean.setShowHoliday(ta.getBoolean(attr, true));
             } else if (attr == R.styleable.CalendarView_show_term) {
                 mAttrsBean.setShowTerm(ta.getBoolean(attr, true));
-            } else if (attr == R.styleable.CalendarView_disable_before) {
-                mAttrsBean.setDisableBefore(ta.getBoolean(attr, false));
             } else if (attr == R.styleable.CalendarView_switch_choose) {
                 mAttrsBean.setSwitchChoose(ta.getBoolean(attr, true));
-            } else if (attr == R.styleable.CalendarView_color_solar) {
+            } else if (attr == R.styleable.CalendarView_solar_color) {
                 mAttrsBean.setColorSolar(ta.getColor(attr, mAttrsBean.getColorSolar()));
-            } else if (attr == R.styleable.CalendarView_size_solar) {
+            } else if (attr == R.styleable.CalendarView_solar_size) {
                 mAttrsBean.setSizeSolar(CalendarUtil.getTextSize(context, ta.getInteger(attr, mAttrsBean.getSizeSolar())));
-            } else if (attr == R.styleable.CalendarView_color_lunar) {
+            } else if (attr == R.styleable.CalendarView_lunar_color) {
                 mAttrsBean.setColorLunar(ta.getColor(attr, mAttrsBean.getColorLunar()));
-            } else if (attr == R.styleable.CalendarView_size_lunar) {
+            } else if (attr == R.styleable.CalendarView_lunar_size) {
                 mAttrsBean.setSizeLunar(CalendarUtil.getTextSize(context, ta.getInt(attr, mAttrsBean.getSizeLunar())));
-            } else if (attr == R.styleable.CalendarView_color_holiday) {
+            } else if (attr == R.styleable.CalendarView_holiday_color) {
                 mAttrsBean.setColorHoliday(ta.getColor(attr, mAttrsBean.getColorHoliday()));
-            } else if (attr == R.styleable.CalendarView_color_choose) {
+            } else if (attr == R.styleable.CalendarView_choose_color) {
                 mAttrsBean.setColorChoose(ta.getColor(attr, mAttrsBean.getColorChoose()));
             } else if (attr == R.styleable.CalendarView_day_bg) {
                 mAttrsBean.setDayBg(ta.getResourceId(attr, mAttrsBean.getDayBg()));
@@ -90,29 +90,39 @@ public class CalendarView extends ViewPager {
 
         ta.recycle();
 
-        dateStart = new int[]{1900, 1};
-        dateEnd = new int[]{2049, 12};
-        dateInit = SolarUtil.getCurrentDate();
-
-        mAttrsBean.setDateStart(dateStart);
-        mAttrsBean.setDateEnd(dateEnd);
-        mAttrsBean.setDateInit(dateInit);
+        startDate = new int[]{1900, 1};
+        endDate = new int[]{2049, 12};
+        mAttrsBean.setStartDate(startDate);
+        mAttrsBean.setEndDate(endDate);
     }
 
     public void init() {
         //根据设定的日期范围计算日历的页数
-        count = (dateEnd[0] - dateStart[0]) * 12 + dateEnd[1] - dateStart[1] + 1;
+        count = (endDate[0] - startDate[0]) * 12 + endDate[1] - startDate[1] + 1;
         calendarPagerAdapter = new CalendarPagerAdapter(count);
         calendarPagerAdapter.setAttrsBean(mAttrsBean);
         calendarPagerAdapter.setOnCalendarViewAdapter(item_layout, calendarViewAdapter);
-
         setAdapter(calendarPagerAdapter);
 
-        currentPosition = CalendarUtil.dateToPosition(dateInit[0], dateInit[1], dateStart[0], dateStart[1]);
-        lastClickDate[0] = currentPosition;
-        lastClickDate[1] = dateInit[2];
+        currentPosition = CalendarUtil.dateToPosition(initDate[0], initDate[1], startDate[0], startDate[1]);
 
-        setLastChooseDate(dateInit[2], true);//因为有默认选中日期，所以需要此操作
+        //单选
+        if (singleDate != null) {
+            lastClickDate[0] = CalendarUtil.dateToPosition(singleDate[0], singleDate[1], startDate[0], startDate[1]);
+            lastClickDate[1] = singleDate[2];
+        }
+
+        //多选
+        if (multiDates != null) {
+            positions = new HashSet<>();
+            chooseDate = new SparseArray<>();
+            for (int[] date : multiDates) {
+                int datePosition = CalendarUtil.dateToPosition(date[0], date[1], startDate[0], startDate[1]);
+                positions.add(datePosition);
+                setChooseDate(date[2], true, datePosition);
+            }
+        }
+
         setCurrentItem(currentPosition, false);
 
         addOnPageChangeListener(new SimpleOnPageChangeListener() {
@@ -121,7 +131,7 @@ public class CalendarView extends ViewPager {
                 refreshMonthView(position);
                 currentPosition = position;
                 if (pagerChangeListener != null) {
-                    int[] date = CalendarUtil.positionToDate(position, dateStart[0], dateStart[1]);
+                    int[] date = CalendarUtil.positionToDate(position, startDate[0], startDate[1]);
                     pagerChangeListener.onPagerChanged(new int[]{date[0], date[1], lastClickDate[1]});
                 }
             }
@@ -155,7 +165,7 @@ public class CalendarView extends ViewPager {
      */
     private void refreshMonthView(int position) {
         MonthView monthView = calendarPagerAdapter.getViews().get(position);
-        if (itemChooseListener != null) {
+        if (mAttrsBean.getMultiDates() != null) {
             if (chooseDate.get(position) != null)
                 monthView.multiChooseRefresh(chooseDate.get(position));
         } else {
@@ -178,16 +188,21 @@ public class CalendarView extends ViewPager {
      * 设置多选时选中的日期
      *
      * @param day
-     * @param flag 多选时flag=true代表选中数据，flag=false代表取消选中
+     * @param flag     多选时flag=true代表选中数据，flag=false代表取消选中
+     * @param position 代表记录viewpager哪一页的数据
      */
-    public void setLastChooseDate(int day, boolean flag) {
-        HashSet<Integer> days = chooseDate.get(currentPosition);
+    public void setChooseDate(int day, boolean flag, int position) {
+        if (position == -1) {
+            position = currentPosition;
+        }
+        HashSet<Integer> days = chooseDate.get(position);
         if (flag) {
             if (days == null) {
                 days = new HashSet<>();
-                chooseDate.put(currentPosition, days);
+                chooseDate.put(position, days);
             }
             days.add(day);
+            positions.add(position);
         } else {
             days.remove(day);
         }
@@ -245,7 +260,7 @@ public class CalendarView extends ViewPager {
      * 跳转到今天
      */
     public void today() {
-        int destPosition = CalendarUtil.dateToPosition(SolarUtil.getCurrentDate()[0], SolarUtil.getCurrentDate()[1], dateStart[0], dateStart[1]);
+        int destPosition = CalendarUtil.dateToPosition(SolarUtil.getCurrentDate()[0], SolarUtil.getCurrentDate()[1], startDate[0], startDate[1]);
         lastClickDate[0] = destPosition;
         lastClickDate[1] = SolarUtil.getCurrentDate()[2];
         if (destPosition == currentPosition) {
@@ -263,12 +278,17 @@ public class CalendarView extends ViewPager {
      * @param day
      */
     public void toSpecifyDate(int year, int month, int day) {
-        int destPosition = CalendarUtil.dateToPosition(year, month, dateStart[0], dateStart[1]);
+        int destPosition = CalendarUtil.dateToPosition(year, month, startDate[0], startDate[1]);
         if (!mAttrsBean.isSwitchChoose() && day != 0) {
             lastClickDate[0] = destPosition;
         }
         lastClickDate[1] = day != 0 ? day : lastClickDate[1];
-        setCurrentItem(destPosition, false);
+        if (destPosition == currentPosition) {
+            //在当月进行日期跳转
+            refreshMonthView(destPosition);
+        } else {
+            setCurrentItem(destPosition, false);
+        }
     }
 
     /**
@@ -309,23 +329,14 @@ public class CalendarView extends ViewPager {
      * 跳转到日历的开始年月
      */
     public void toStart() {
-        toSpecifyDate(dateStart[0], dateStart[1], 0);
+        toSpecifyDate(startDate[0], startDate[1], 0);
     }
 
     /**
      * 跳转到日历的结束年月
      */
     public void toEnd() {
-        toSpecifyDate(dateEnd[0], dateEnd[1], 0);
-    }
-
-    /**
-     * 得到默认选中的日期
-     *
-     * @return
-     */
-    public DateBean getDateInit() {
-        return CalendarUtil.getDateBean(dateInit[0], dateInit[1], dateInit[2]);
+        toSpecifyDate(endDate[0], endDate[1], 0);
     }
 
     /**
@@ -337,39 +348,34 @@ public class CalendarView extends ViewPager {
     }
 
     /**
-     * 设置初始选中的日期，是否标记默认日期
+     * 设置日历初始显示的年月
      *
-     * @param dateStr
+     * @param date
      * @return
      */
-    public CalendarView setDateInit(String dateStr, boolean showDateInit) {
-        dateInit = CalendarUtil.strToArray(dateStr);
-        if (dateInit == null) {
-            dateInit = SolarUtil.getCurrentDate();
-        }
-        mAttrsBean.setDateInit(dateInit);
-        mAttrsBean.setShowDateInit(showDateInit);
+    public CalendarView setInitDate(String date) {
+        initDate = CalendarUtil.strToArray(date);
         return this;
     }
 
     /**
      * 设置日历的开始年月、结束年月
      *
-     * @param dateStart
-     * @param dateEnd
+     * @param startDate
+     * @param endDate
      * @return
      */
-    public CalendarView setDateStartEnd(String dateStart, String dateEnd) {
-        this.dateStart = CalendarUtil.strToArray(dateStart);
-        if (dateStart == null) {
-            this.dateStart = new int[]{1900, 1};
+    public CalendarView setStartEndDate(String startDate, String endDate) {
+        this.startDate = CalendarUtil.strToArray(startDate);
+        if (startDate == null) {
+            this.startDate = new int[]{1900, 1};
         }
-        this.dateEnd = CalendarUtil.strToArray(dateEnd);
-        if (dateEnd == null) {
-            this.dateEnd = new int[]{2049, 12};
+        this.endDate = CalendarUtil.strToArray(endDate);
+        if (endDate == null) {
+            this.endDate = new int[]{2049, 12};
         }
-        mAttrsBean.setDateStart(this.dateStart);
-        mAttrsBean.setDateEnd(this.dateEnd);
+        mAttrsBean.setStartDate(this.startDate);
+        mAttrsBean.setEndDate(this.endDate);
         return this;
     }
 
@@ -379,11 +385,67 @@ public class CalendarView extends ViewPager {
      * @param dates
      * @return
      */
-    public CalendarView setMultiDateInit(List<String> dates) {
-        multiDateInitList = new ArrayList<>();
+    public CalendarView setMultiDate(List<String> dates) {
+        multiDates = new ArrayList<>();
         for (String date : dates) {
-            multiDateInitList.add(CalendarUtil.strToArray(date));
+            multiDates.add(CalendarUtil.strToArray(date));
         }
+        mAttrsBean.setMultiDates(multiDates);
         return this;
+    }
+
+
+    /**
+     * 设置单选时默认选中的日期
+     *
+     * @param date
+     * @return
+     */
+    public CalendarView setSingleDate(String date) {
+        singleDate = CalendarUtil.strToArray(date);
+        mAttrsBean.setSingleDate(singleDate);
+        return this;
+    }
+
+    /**
+     * 设置日历禁用范围
+     *
+     * @param startDate 禁用startDate之前的日期
+     * @param endDate   禁用endDate之后的日期
+     * @return
+     */
+    public CalendarView setDisableStartEndDate(String startDate, String endDate) {
+        mAttrsBean.setDisableStartDate(CalendarUtil.strToArray(startDate));
+        mAttrsBean.setDisableEndDate(CalendarUtil.strToArray(endDate));
+        return this;
+    }
+
+    /**
+     * 得到单选时当前选中的日期
+     *
+     * @return
+     */
+    public DateBean getSingleDate() {
+        int[] date = CalendarUtil.positionToDate(lastClickDate[0], startDate[0], startDate[1]);
+        return CalendarUtil.getDateBean(date[0], date[1], lastClickDate[1]);
+    }
+
+    /**
+     * 得到多选时选中的日期
+     *
+     * @return
+     */
+    public List<DateBean> getMultiDate() {
+        List<DateBean> list = new ArrayList<>();
+        for (Integer position : positions) {
+            HashSet<Integer> days = chooseDate.get(position);
+            if (days.size() > 0) {
+                int[] date = CalendarUtil.positionToDate(position, startDate[0], startDate[1]);
+                for (Integer day : days) {
+                    list.add(CalendarUtil.getDateBean(date[0], date[1], day));
+                }
+            }
+        }
+        return list;
     }
 }

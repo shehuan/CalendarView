@@ -38,8 +38,9 @@ public class MainActivity extends AppCompatActivity {
         map.put("2017.11.11", "tgb");
         calendarView.
                 setSpecifyMap(map)
-                .setDateStartEnd("2010.7", "2018.12")
-                .setDateInit("", false)
+                .setStartEndDate("2010.7", "2018.12")
+                .setInitDate("2017.11")
+                .setSingleDate("2017.12.11")
                 .init();
 //        calendarView.setOnCalendarViewAdapter(R.layout.item_layout, new CalendarViewAdapter() {
 //            @Override
@@ -50,7 +51,7 @@ public class MainActivity extends AppCompatActivity {
 //            }
 //        });
 
-        DateBean d = calendarView.getDateInit();
+        DateBean d = calendarView.getSingleDate();
 
         title.setText(d.getSolar()[0] + "年" + d.getSolar()[1] + "月" + d.getSolar()[2] + "日");
 

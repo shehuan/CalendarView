@@ -61,7 +61,7 @@ public class MonthView extends ViewGroup {
         }
         lastMonthDays = 0;
         nextMonthDays = 0;
-        boolean findInitShowDay = false;//是否找到默认选中的日期
+        boolean findSingleDate = false;//是否找到单选时默认选中的日期
         chooseDays.clear();
 
         this.currentMonthDays = currentMonthDays;
@@ -137,31 +137,55 @@ public class MonthView extends ViewGroup {
                 lunarDay.setVisibility(GONE);
             }
 
-
-            //默认选中当天
-            if (mAttrsBean.isShowDateInit() && !findInitShowDay
+            //找到单选时默认选中的日期，并选中（如果有）
+            if (mAttrsBean.getSingleDate() != null && !findSingleDate
                     && date.getType() == 1
-                    && mAttrsBean.getDateInit()[0] == date.getSolar()[0]
-                    && mAttrsBean.getDateInit()[1] == date.getSolar()[1]
-                    && mAttrsBean.getDateInit()[2] == date.getSolar()[2]) {
+                    && mAttrsBean.getSingleDate()[0] == date.getSolar()[0]
+                    && mAttrsBean.getSingleDate()[1] == date.getSolar()[1]
+                    && mAttrsBean.getSingleDate()[2] == date.getSolar()[2]) {
                 lastClickedView = view;
-                chooseDays.add(date.getSolar()[2]);
                 setDayColor(view, COLOR_SET);
-                findInitShowDay = true;
+                findSingleDate = true;
             }
 
+            //找到多选时默认选中的多个日期，并选中（如果有）
+            if (mAttrsBean.getMultiDates() != null) {
+                for (int[] d : mAttrsBean.getMultiDates()) {
+                    if (date.getType() == 1
+                            && d[0] == date.getSolar()[0]
+                            && d[1] == date.getSolar()[1]
+                            && d[2] == date.getSolar()[2]) {
+                        setDayColor(view, COLOR_SET);
+                        chooseDays.add(d[2]);
+                        break;
+                    }
+                }
+            }
+
+            //设置禁用日期
             if (date.getType() == 1) {
                 view.setTag(date.getSolar()[2]);
-                if ((date.getSolar()[0] < mAttrsBean.getDateInit()[0]
-                        || (date.getSolar()[0] == mAttrsBean.getDateInit()[0] && date.getSolar()[1] < mAttrsBean.getDateInit()[1])
-                        || (date.getSolar()[0] == mAttrsBean.getDateInit()[0] && date.getSolar()[1] == mAttrsBean.getDateInit()[1] && date.getSolar()[2] < mAttrsBean.getDateInit()[2]))) {
-                    if (mAttrsBean.isDisableBefore()) {
-                        solarDay.setTextColor(mAttrsBean.getColorLunar());
-                        lunarDay.setTextColor(mAttrsBean.getColorLunar());
-                        view.setTag(-1);
-                        addView(view, i);
-                        continue;
-                    }
+                view.setTag(date.getSolar()[2]);
+                if (mAttrsBean.getDisableStartDate() != null
+                        && (date.getSolar()[0] < mAttrsBean.getDisableStartDate()[0]
+                        || (date.getSolar()[0] == mAttrsBean.getDisableStartDate()[0] && date.getSolar()[1] < mAttrsBean.getDisableStartDate()[1])
+                        || (date.getSolar()[0] == mAttrsBean.getDisableStartDate()[0] && date.getSolar()[1] == mAttrsBean.getDisableStartDate()[1] && date.getSolar()[2] < mAttrsBean.getDisableStartDate()[2]))) {
+                    solarDay.setTextColor(mAttrsBean.getColorLunar());
+                    lunarDay.setTextColor(mAttrsBean.getColorLunar());
+                    view.setTag(-1);
+                    addView(view, i);
+                    continue;
+                }
+
+                if (mAttrsBean.getDisableEndDate() != null
+                        && (date.getSolar()[0] > mAttrsBean.getDisableEndDate()[0]
+                        || (date.getSolar()[0] == mAttrsBean.getDisableEndDate()[0] && date.getSolar()[1] > mAttrsBean.getDisableEndDate()[1])
+                        || (date.getSolar()[0] == mAttrsBean.getDisableEndDate()[0] && date.getSolar()[1] == mAttrsBean.getDisableEndDate()[1] && date.getSolar()[2] > mAttrsBean.getDisableEndDate()[2]))) {
+                    solarDay.setTextColor(mAttrsBean.getColorLunar());
+                    lunarDay.setTextColor(mAttrsBean.getColorLunar());
+                    view.setTag(-1);
+                    addView(view, i);
+                    continue;
                 }
             }
 
@@ -184,7 +208,7 @@ public class MonthView extends ViewGroup {
                                 chooseDays.add(day);
                                 flag = true;
                             }
-                            calendarView.setLastChooseDate(day, flag);
+                            calendarView.setChooseDate(day, flag, -1);
                             chooseListener.onMonthItemChoose(v, date, flag);
                         } else {
                             calendarView.setLastClickDay(day);
@@ -305,8 +329,6 @@ public class MonthView extends ViewGroup {
     public void refresh(int day, boolean flag) {
         if (lastClickedView != null) {
             setDayColor(lastClickedView, COLOR_RESET);
-        } else {
-            return;
         }
         if (!flag) {
             return;
@@ -326,11 +348,6 @@ public class MonthView extends ViewGroup {
         for (Integer day : set) {
             setDayColor(findDestView(day), COLOR_SET);
             chooseDays.add(day);
-        }
-        //防止造成默认日期取消后代码重复选中的假象
-        if (chooseDays.contains(mAttrsBean.getDateInit()[2]) && (!set.contains(mAttrsBean.getDateInit()[2]) || set.isEmpty())) {
-            setDayColor(findDestView(mAttrsBean.getDateInit()[2]), COLOR_RESET);
-            chooseDays.remove(mAttrsBean.getDateInit()[2]);
         }
         invalidate();
     }

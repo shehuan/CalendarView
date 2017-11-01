@@ -9,26 +9,18 @@
         <attr name="show_holiday" format="boolean" />
         <!--是否显示节气-->
         <attr name="show_term" format="boolean" />
-        <!--&lt;!&ndash;开始日期(xxxx.x)&ndash;&gt;-->
-        <!--<attr name="date_start" format="string" />-->
-        <!--&lt;!&ndash;结束日期(xxxx.x)&ndash;&gt;-->
-        <!--<attr name="date_end" format="string" />-->
-        <!--&lt;!&ndash;默认展示、选中的日期(xxxx.x.x)&ndash;&gt;-->
-        <!--<attr name="date_init" format="string" />-->
-        <!--是否禁用默认选中日期前的所有日期-->
-        <attr name="disable_before" format="boolean" />
         <!--阳历的日期颜色-->
-        <attr name="color_solar" format="color" />
+        <attr name="solar_color" format="color" />
         <!--阳历的日期尺寸-->
-        <attr name="size_solar" format="integer" />
+        <attr name="solar_size" format="integer" />
         <!--农历的日期颜色-->
-        <attr name="color_lunar" format="color" />
+        <attr name="lunar_color" format="color" />
         <!--农历的日期尺寸-->
-        <attr name="size_lunar" format="integer" />
+        <attr name="lunar_size" format="integer" />
         <!--节日文字颜色-->
-        <attr name="color_holiday" format="color" />
+        <attr name="holiday_color" format="color" />
         <!--选中的日期文字颜色-->
-        <attr name="color_choose" format="color" />
+        <attr name="choose_color" format="color" />
         <!--选中的日期背景-->
         <attr name="day_bg" format="reference" />
         <!--单选时切换月份，是否选中上次的日期-->

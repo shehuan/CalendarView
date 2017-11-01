@@ -2,6 +2,7 @@ package com.othershe.calendarviewtest;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
@@ -9,6 +10,9 @@ import com.othershe.calendarview.weiget.CalendarView;
 import com.othershe.calendarview.bean.DateBean;
 import com.othershe.calendarview.listener.OnMonthItemChooseListener;
 import com.othershe.calendarview.listener.OnPagerChangeListener;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class MultiChooseActivity extends AppCompatActivity {
 
@@ -26,14 +30,25 @@ public class MultiChooseActivity extends AppCompatActivity {
 
         chooseDate = (TextView) findViewById(R.id.choose_date);
 
+        List<String> list = new ArrayList<>();
+        list.add("2017.11.11");
+        list.add("2017.11.12");
+        list.add("2017.11.22");
+        list.add("2017.12.12");
+
         calendarView = (CalendarView) findViewById(R.id.calendar);
-        calendarView.init();
+        calendarView
+                .setStartEndDate("2016.1", "2018.12")
+                .setDisableStartEndDate("2017.10.7", "2017.12.25")
+                .setInitDate("2017.11")
+                .setMultiDate(list)
+                .init();
 
-        DateBean date = calendarView.getDateInit();
-        title.setText(date.getSolar()[0] + "年" + date.getSolar()[1] + "月" + date.getSolar()[2] + "日");
+        title.setText(2017 + "年" + 11 + "月");
 
-        String d = date.getSolar()[0] + "." + date.getSolar()[1] + "." + date.getSolar()[2] + ".";
-        sb.append("选中：" + d + "\n");
+        for (String d : list) {
+            sb.append("选中：" + d + "\n");
+        }
         chooseDate.setText(sb.toString());
 
         calendarView.setOnMonthItemChooseListener(new OnMonthItemChooseListener() {
@@ -46,6 +61,12 @@ public class MultiChooseActivity extends AppCompatActivity {
                     sb.append("取消：" + d + "\n");
                 }
                 chooseDate.setText(sb.toString());
+
+                if (flag) {
+                    for (DateBean db : calendarView.getMultiDate()) {
+                        Log.e("date:", "" + db.getSolar()[0] + db.getSolar()[1] + db.getSolar()[2]);
+                    }
+                }
             }
         });
 
