@@ -10,8 +10,8 @@ import com.othershe.calendarview.R;
 import com.othershe.calendarview.bean.AttrsBean;
 import com.othershe.calendarview.bean.DateBean;
 import com.othershe.calendarview.listener.CalendarViewAdapter;
-import com.othershe.calendarview.listener.OnMonthItemChooseListener;
-import com.othershe.calendarview.listener.OnMonthItemClickListener;
+import com.othershe.calendarview.listener.OnMultiChooseListener;
+import com.othershe.calendarview.listener.OnSingleChooseListener;
 import com.othershe.calendarview.listener.OnPagerChangeListener;
 import com.othershe.calendarview.utils.CalendarUtil;
 import com.othershe.calendarview.utils.SolarUtil;
@@ -27,8 +27,8 @@ public class CalendarView extends ViewPager {
     private int currentPosition;
 
     private OnPagerChangeListener pagerChangeListener;
-    private OnMonthItemClickListener itemClickListener;
-    private OnMonthItemChooseListener itemChooseListener;
+    private OnSingleChooseListener singleChooseListener;
+    private OnMultiChooseListener multiChooseListener;
     private CalendarViewAdapter calendarViewAdapter;
     private int item_layout;
 
@@ -85,6 +85,8 @@ public class CalendarView extends ViewPager {
                 mAttrsBean.setColorChoose(ta.getColor(attr, mAttrsBean.getColorChoose()));
             } else if (attr == R.styleable.CalendarView_day_bg) {
                 mAttrsBean.setDayBg(ta.getResourceId(attr, mAttrsBean.getDayBg()));
+            } else if (attr == R.styleable.CalendarView_choose_type) {
+                mAttrsBean.setChooseType(ta.getInt(attr, 0));
             }
         }
 
@@ -107,19 +109,21 @@ public class CalendarView extends ViewPager {
         currentPosition = CalendarUtil.dateToPosition(initDate[0], initDate[1], startDate[0], startDate[1]);
 
         //单选
-        if (singleDate != null) {
+        if (mAttrsBean.getChooseType() == 0 && singleDate != null) {
             lastClickDate[0] = CalendarUtil.dateToPosition(singleDate[0], singleDate[1], startDate[0], startDate[1]);
             lastClickDate[1] = singleDate[2];
         }
 
         //多选
-        if (multiDates != null) {
+        if (mAttrsBean.getChooseType() == 1) {
             positions = new HashSet<>();
             chooseDate = new SparseArray<>();
-            for (int[] date : multiDates) {
-                int datePosition = CalendarUtil.dateToPosition(date[0], date[1], startDate[0], startDate[1]);
-                positions.add(datePosition);
-                setChooseDate(date[2], true, datePosition);
+            if (multiDates != null) {
+                for (int[] date : multiDates) {
+                    int datePosition = CalendarUtil.dateToPosition(date[0], date[1], startDate[0], startDate[1]);
+                    positions.add(datePosition);
+                    setChooseDate(date[2], true, datePosition);
+                }
             }
         }
 
@@ -165,17 +169,19 @@ public class CalendarView extends ViewPager {
      */
     private void refreshMonthView(int position) {
         MonthView monthView = calendarPagerAdapter.getViews().get(position);
-        if (mAttrsBean.getMultiDates() != null) {
+        if (mAttrsBean.getChooseType() == 1) {//多选
             if (chooseDate.get(position) != null)
                 monthView.multiChooseRefresh(chooseDate.get(position));
         } else {
-            boolean flag = (!mAttrsBean.isSwitchChoose() && lastClickDate[0] == position) || mAttrsBean.isSwitchChoose();
+            //单选时，如果设置切换月份不选中上次选中的日期但如果切换回有选中日期的页则需要刷新选中，或者切换选中开启则需要刷新选中
+            boolean flag = (!mAttrsBean.isSwitchChoose() && lastClickDate[0] == position)
+                    || mAttrsBean.isSwitchChoose();
             monthView.refresh(lastClickDate[1], flag);
         }
     }
 
     /**
-     * 设置上次点击的日期
+     * 设置单选时选中的日期
      *
      * @param day
      */
@@ -209,29 +215,29 @@ public class CalendarView extends ViewPager {
     }
 
     /**
-     * 设置日期点击回调
+     * 设置日期单选回调
      *
-     * @param itemClickListener
+     * @param singleChooseListener
      */
-    public void setOnItemClickListener(OnMonthItemClickListener itemClickListener) {
-        this.itemClickListener = itemClickListener;
+    public void setOnSingleChooseListener(OnSingleChooseListener singleChooseListener) {
+        this.singleChooseListener = singleChooseListener;
     }
 
-    public OnMonthItemChooseListener getItemChooseListener() {
-        return itemChooseListener;
+    public OnMultiChooseListener getMultiChooseListener() {
+        return multiChooseListener;
     }
 
     /**
      * 设置日期多选回调
      *
-     * @param itemChooseListener
+     * @param multiChooseListener
      */
-    public void setOnMonthItemChooseListener(OnMonthItemChooseListener itemChooseListener) {
-        this.itemChooseListener = itemChooseListener;
+    public void setOnMultiChooseListener(OnMultiChooseListener multiChooseListener) {
+        this.multiChooseListener = multiChooseListener;
     }
 
-    public OnMonthItemClickListener getItemClickListener() {
-        return itemClickListener;
+    public OnSingleChooseListener getSingleChooseListener() {
+        return singleChooseListener;
     }
 
     /**
@@ -249,15 +255,14 @@ public class CalendarView extends ViewPager {
      * @param item_layout         自定义的日期item布局
      * @param calendarViewAdapter 解析item的接口
      */
-    public void setOnCalendarViewAdapter(int item_layout, CalendarViewAdapter calendarViewAdapter) {
+    public CalendarView setOnCalendarViewAdapter(int item_layout, CalendarViewAdapter calendarViewAdapter) {
         this.item_layout = item_layout;
         this.calendarViewAdapter = calendarViewAdapter;
-
-        init();
+        return this;
     }
 
     /**
-     * 跳转到今天
+     * 单选时跳转到今天
      */
     public void today() {
         int destPosition = CalendarUtil.dateToPosition(SolarUtil.getCurrentDate()[0], SolarUtil.getCurrentDate()[1], startDate[0], startDate[1]);
@@ -271,7 +276,7 @@ public class CalendarView extends ViewPager {
     }
 
     /**
-     * 跳转到指定日期
+     * 单选时跳转到指定日期
      *
      * @param year
      * @param month

@@ -13,8 +13,8 @@ import com.othershe.calendarview.R;
 import com.othershe.calendarview.bean.AttrsBean;
 import com.othershe.calendarview.bean.DateBean;
 import com.othershe.calendarview.listener.CalendarViewAdapter;
-import com.othershe.calendarview.listener.OnMonthItemChooseListener;
-import com.othershe.calendarview.listener.OnMonthItemClickListener;
+import com.othershe.calendarview.listener.OnMultiChooseListener;
+import com.othershe.calendarview.listener.OnSingleChooseListener;
 
 import java.util.HashSet;
 import java.util.List;
@@ -138,7 +138,9 @@ public class MonthView extends ViewGroup {
             }
 
             //找到单选时默认选中的日期，并选中（如果有）
-            if (mAttrsBean.getSingleDate() != null && !findSingleDate
+            if (mAttrsBean.getChooseType() == 0
+                    && mAttrsBean.getSingleDate() != null
+                    && !findSingleDate
                     && date.getType() == 1
                     && mAttrsBean.getSingleDate()[0] == date.getSolar()[0]
                     && mAttrsBean.getSingleDate()[1] == date.getSolar()[1]
@@ -149,7 +151,7 @@ public class MonthView extends ViewGroup {
             }
 
             //找到多选时默认选中的多个日期，并选中（如果有）
-            if (mAttrsBean.getMultiDates() != null) {
+            if (mAttrsBean.getChooseType() == 1 && mAttrsBean.getMultiDates() != null) {
                 for (int[] d : mAttrsBean.getMultiDates()) {
                     if (date.getType() == 1
                             && d[0] == date.getSolar()[0]
@@ -194,10 +196,10 @@ public class MonthView extends ViewGroup {
                 public void onClick(View v) {
                     int day = date.getSolar()[2];
                     CalendarView calendarView = (CalendarView) getParent();
-                    OnMonthItemClickListener clickListener = calendarView.getItemClickListener();
-                    OnMonthItemChooseListener chooseListener = calendarView.getItemChooseListener();
+                    OnSingleChooseListener clickListener = calendarView.getSingleChooseListener();
+                    OnMultiChooseListener chooseListener = calendarView.getMultiChooseListener();
                     if (date.getType() == 1) {//点击当月
-                        if (chooseListener != null) {//多选的情况
+                        if (mAttrsBean.getChooseType() == 1 && chooseListener != null) {//多选的情况
                             boolean flag;
                             if (chooseDays.contains(day)) {
                                 setDayColor(v, COLOR_RESET);
@@ -209,7 +211,7 @@ public class MonthView extends ViewGroup {
                                 flag = true;
                             }
                             calendarView.setChooseDate(day, flag, -1);
-                            chooseListener.onMonthItemChoose(v, date, flag);
+                            chooseListener.onMultiChoose(v, date, flag);
                         } else {
                             calendarView.setLastClickDay(day);
                             if (lastClickedView != null) {
@@ -219,20 +221,20 @@ public class MonthView extends ViewGroup {
                             lastClickedView = v;
 
                             if (clickListener != null) {
-                                clickListener.onMonthItemClick(v, date);
+                                clickListener.onSingleChoose(v, date);
                             }
                         }
                     } else if (date.getType() == 0) {//点击上月
                         calendarView.setLastClickDay(day);
                         calendarView.lastMonth();
                         if (clickListener != null) {
-                            clickListener.onMonthItemClick(v, date);
+                            clickListener.onSingleChoose(v, date);
                         }
                     } else if (date.getType() == 2) {//点击下月
                         calendarView.setLastClickDay(day);
                         calendarView.nextMonth();
                         if (clickListener != null) {
-                            clickListener.onMonthItemClick(v, date);
+                            clickListener.onSingleChoose(v, date);
                         }
                     }
                 }

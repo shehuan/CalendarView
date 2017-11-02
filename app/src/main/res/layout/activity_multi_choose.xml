@@ -44,7 +44,8 @@
     <com.othershe.calendarview.weiget.CalendarView
         android:id="@+id/calendar"
         android:layout_width="match_parent"
-        android:layout_height="220dp" />
+        android:layout_height="220dp"
+        calendarview:choose_type="multi" />
 
     <ScrollView
         android:layout_width="match_parent"

@@ -8,7 +8,7 @@ import android.widget.TextView;
 
 import com.othershe.calendarview.weiget.CalendarView;
 import com.othershe.calendarview.bean.DateBean;
-import com.othershe.calendarview.listener.OnMonthItemChooseListener;
+import com.othershe.calendarview.listener.OnMultiChooseListener;
 import com.othershe.calendarview.listener.OnPagerChangeListener;
 
 import java.util.ArrayList;
@@ -41,19 +41,19 @@ public class MultiChooseActivity extends AppCompatActivity {
                 .setStartEndDate("2016.1", "2018.12")
                 .setDisableStartEndDate("2017.10.7", "2017.12.25")
                 .setInitDate("2017.11")
-                .setMultiDate(list)
+//                .setMultiDate(list)
                 .init();
 
         title.setText(2017 + "年" + 11 + "月");
 
         for (String d : list) {
-            sb.append("选中：" + d + "\n");
+//            sb.append("选中：" + d + "\n");
         }
-        chooseDate.setText(sb.toString());
+//        chooseDate.setText(sb.toString());
 
-        calendarView.setOnMonthItemChooseListener(new OnMonthItemChooseListener() {
+        calendarView.setOnMultiChooseListener(new OnMultiChooseListener() {
             @Override
-            public void onMonthItemChoose(View view, DateBean date, boolean flag) {
+            public void onMultiChoose(View view, DateBean date, boolean flag) {
                 String d = date.getSolar()[0] + "." + date.getSolar()[1] + "." + date.getSolar()[2] + ".";
                 if (flag) {//选中
                     sb.append("选中：" + d + "\n");
@@ -62,6 +62,7 @@ public class MultiChooseActivity extends AppCompatActivity {
                 }
                 chooseDate.setText(sb.toString());
 
+                //test
                 if (flag) {
                     for (DateBean db : calendarView.getMultiDate()) {
                         Log.e("date:", "" + db.getSolar()[0] + db.getSolar()[1] + db.getSolar()[2]);
@@ -73,7 +74,7 @@ public class MultiChooseActivity extends AppCompatActivity {
         calendarView.setOnPagerChangeListener(new OnPagerChangeListener() {
             @Override
             public void onPagerChanged(int[] date) {
-                title.setText(date[0] + "年" + date[1] + "月" + date[2] + "日");
+                title.setText(date[0] + "年" + date[1] + "月");
             }
         });
     }

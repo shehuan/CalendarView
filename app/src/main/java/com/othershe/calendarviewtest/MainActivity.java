@@ -13,7 +13,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.othershe.calendarview.bean.DateBean;
-import com.othershe.calendarview.listener.OnMonthItemClickListener;
+import com.othershe.calendarview.listener.CalendarViewAdapter;
+import com.othershe.calendarview.listener.OnSingleChooseListener;
 import com.othershe.calendarview.listener.OnPagerChangeListener;
 import com.othershe.calendarview.weiget.CalendarView;
 
@@ -36,20 +37,21 @@ public class MainActivity extends AppCompatActivity {
         map.put("2017.9.15", "edc");
         map.put("2017.11.6", "rfv");
         map.put("2017.11.11", "tgb");
-        calendarView.
-                setSpecifyMap(map)
+        calendarView
+//                .setSpecifyMap(map)
                 .setStartEndDate("2010.7", "2018.12")
                 .setInitDate("2017.11")
-                .setSingleDate("2017.12.11")
+                .setSingleDate("2017.12.12")
                 .init();
-//        calendarView.setOnCalendarViewAdapter(R.layout.item_layout, new CalendarViewAdapter() {
+
+//       .setOnCalendarViewAdapter(R.layout.item_layout, new CalendarViewAdapter() {
 //            @Override
 //            public TextView[] convertView(View view, DateBean date) {
 //                TextView solarDay = (TextView) view.findViewById(R.id.solar_day);
 //                TextView lunarDay = (TextView) view.findViewById(R.id.lunar_day);
 //                return new TextView[]{solarDay, lunarDay};
 //            }
-//        });
+//        }).init();
 
         DateBean d = calendarView.getSingleDate();
 
@@ -62,9 +64,9 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        calendarView.setOnItemClickListener(new OnMonthItemClickListener() {
+        calendarView.setOnSingleChooseListener(new OnSingleChooseListener() {
             @Override
-            public void onMonthItemClick(View view, DateBean date) {
+            public void onSingleChoose(View view, DateBean date) {
                 title.setText(date.getSolar()[0] + "年" + date.getSolar()[1] + "月" + date.getSolar()[2] + "日");
             }
         });

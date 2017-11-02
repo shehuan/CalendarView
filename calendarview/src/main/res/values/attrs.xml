@@ -25,6 +25,11 @@
         <attr name="day_bg" format="reference" />
         <!--单选时切换月份，是否选中上次的日期-->
         <attr name="switch_choose" format="boolean" />
+        <!--设置单选、多选-->
+        <attr name="choose_type" format="enum">
+            <enum name="single" value="0" />
+            <enum name="multi" value="1" />
+        </attr>
     </declare-styleable>
 
     <declare-styleable name="WeekView">

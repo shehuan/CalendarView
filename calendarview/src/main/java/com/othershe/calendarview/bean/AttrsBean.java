@@ -28,6 +28,7 @@ public class AttrsBean {
     private int sizeLunar = 8;//阴历日期文字尺寸
     private int dayBg = R.drawable.blue_circle;//选中的背景
     private Map<String, String> specifyMap;//指定日期对应的文字map
+    private int chooseType = 0;//表示日历是单选还是多选
 
     public int[] getStartDate() {
         return startDate;
@@ -179,5 +180,13 @@ public class AttrsBean {
 
     public void setSpecifyMap(Map<String, String> specifyMap) {
         this.specifyMap = specifyMap;
+    }
+
+    public int getChooseType() {
+        return chooseType;
+    }
+
+    public void setChooseType(int chooseType) {
+        this.chooseType = chooseType;
     }
 }

@@ -12,10 +12,8 @@
 #### [demo下载](https://fir.im/vehj?release_id=59154975ca87a8790e00015b)
 
 ### 效果图：
-
-![](https://github.com/Othershe/CalendarView/blob/master/screenshot/1.gif)
-![](https://github.com/Othershe/CalendarView/blob/master/screenshot/2.gif)
-![](https://github.com/Othershe/CalendarView/blob/master/screenshot/3.gif)
+|![](screenshot/1.gif)|![](screenshot/2.gif)|![](screenshot/3.gif)|
+|---|---|---|
 
 ### 基本用法：
 **Step 1. 添加JitPack仓库**
@@ -43,23 +41,17 @@ dependencies {
 <com.othershe.calendarview.CalendarView
         android:id="@+id/calendar"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="220dp" />
 ```
 **Step 4. 相关初始化**
 ```java
 CalendarView calendarView = (CalendarView) findViewById(R.id.calendar);
 //日历init
-calendarView.init();
-//自定义日期ietm的布局样式
-calendarView.setOnCalendarViewAdapter(R.layout.item_layout, new CalendarViewAdapter() {
-            @Override
-            public TextView[] convertView(View view, DateBean date) {
-                TextView solarDay = (TextView) view.findViewById(R.id.solar_day);
-                TextView lunarDay = (TextView) view.findViewById(R.id.lunar_day);
-                return new TextView[]{solarDay, lunarDay};
-            }
-        });
-*注意：init()和setOnCalendarViewAdapter()不要同时使用
+calendarView
+        .setStartEndDate("2010.7", "2018.12")
+        .setInitDate("2017.11")
+        .setSingleDate("2017.12.12")
+        .init();
 
 //月份切换回调
 calendarView.setOnPagerChangeListener(new OnPagerChangeListener() {
@@ -69,57 +61,57 @@ calendarView.setOnPagerChangeListener(new OnPagerChangeListener() {
             }
         });
         
-//日期点击回调
+//单选回调
 calendarView.setOnItemClickListener(new OnMonthItemClickListener() {
             @Override
             public void onMonthItemClick(View view, DateBean date) {
                 
             }
         });
-        
-//日期多选回调
-calendarView.setOnMonthItemChooseListener(new OnMonthItemChooseListener() {
-            @Override
-            public void onMonthItemChoose(View view, DateBean date, boolean flag) {
-               //flag=true代表选中数据，flag=false代表取消选中
-            }
-        });
-*注意：点击和多选操作不要同时使用
 
 ```
 ### CalendarView相关方法：
 |方法名|描述
 |---|---|
-|today()| 跳转到今天
-|toSpecifyDate(int year, int month, int day)|跳转到指定年月日
+|setInitDate(String date)|设置日历的初始显示年月
+|setStartEndDate(String startDate, String endDate)|设置日历开始、结束年月
+|setDisableStartEndDate(String startDate, String endDate)|设置日历的禁用日期范围（小于startDate、大于endDate禁用）
+|setSpecifyMap(HashMap<String, String> map)|将显示农历的区域替换成指定文字
+|setSingleDate(String date)|设置单选时初始选中的日期（不设置则不默认选中）
+|getSingleDate()|得到单选时选中的日期
+|setMultiDate(List<String> dates)|设置多选时默认选中的日期集合
+|getMultiDate()|得到多选时选中的全部日期
+|toSpecifyDate(int year, int month, int day)|单选时跳转到指定年月日
+|setOnCalendarViewAdapter(int layoutId, CalendarViewAdapter adapter)|设置自定义日期item样式
+|init()|日期初始化（以上属性配置完后调用）
+|setOnPagerChangeListener(OnPagerChangeListener listener)|设置月份切换回调
+|setOnSingleChooseListener(OnSingleChooseListener listener)|设置单选回调
+|setOnMultiChooseListener(OnMultiChooseListener listener)|设置多选回调
+|today()| 单选时跳转到今天
 |nextMonth()|跳转到下个月
 |lastMonth()|跳转到上个月
 |nextYear()|跳转到下一年的当前月
 |lastYear()|跳转到上一年的当前月
 |toStart()|跳转到日历的开始年月
 |toEnd()|跳转到日历的结束年月
-|getDateInit()|得到设置的默认选中日期（设置则返回当天日期）
 
 ### CalendarView的自定义属性
 namespace：xmlns:calendarview="http://schemas.android.com/apk/res-auto"
 
 |属性名|格式|描述|默认值
 |---|---|---|---|
+|choose_type|enum|设置单选（single）、多选(multi)|single
 |show_lunar|boolean|是否显示农历|true
 |show_last_next|boolean|是否在MonthView显示上月和下月日期|true
 |show_holiday|boolean|是否显示节假日|true
 |show_term|boolean|是否显示节气|true
-|date_start|string|日历的开始年月（例如：1990.5）|1900.1
-|date_end|string|日历的结束年月（例如：2025.12）|2049.12
-|date_init|string|日历默认展示、选中的日期(例如：2017.5.20)，不设置则为当天
-|disable_before|boolean|是否禁用默认选中日期前的所有日期|false
 |switch_choose|boolean|单选时切换月份，是否选中上次的日期|true
-|color_solar|color|阳历日期的颜色
-|size_solar|integer|阳历的日期尺寸|14
-|color_lunar|color|农历的日期颜色
-|size_lunar|integer|农历的日期尺寸|8
-|color_holiday|color|节假日、节气的颜色
-|color_choose|color|选中的日期颜色
+|solar_color|color|阳历日期的颜色
+|solar_size|integer|阳历的日期尺寸|14
+|lunar_color|color|农历的日期颜色
+|lunar_size|integer|农历的日期尺寸|8
+|holiday_color|color|节假日、节气的颜色
+|choose_color|color|选中的日期颜色
 |day_bg|reference|选中的日期背景(图片)
 
 ### WeekView的自定义属性

@@ -7,10 +7,10 @@ import com.othershe.calendarview.bean.DateBean;
 /**
  * 日期点击接口
  */
-public interface OnMonthItemClickListener {
+public interface OnSingleChooseListener {
     /**
      * @param view
      * @param date
      */
-    void onMonthItemClick(View view, DateBean date);
+    void onSingleChoose(View view, DateBean date);
 }

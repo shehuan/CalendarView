@@ -47,9 +47,10 @@
         android:id="@+id/calendar"
         android:layout_width="match_parent"
         android:layout_height="220dp"
-        calendarview:show_holiday="false"
+        calendarview:choose_type="single"
+        calendarview:show_holiday="true"
         calendarview:show_lunar="true"
-        calendarview:show_term="false"
+        calendarview:show_term="true"
         calendarview:switch_choose="false" />
 
     <LinearLayout
