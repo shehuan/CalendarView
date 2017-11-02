@@ -7,6 +7,7 @@ import android.util.TypedValue;
 import com.othershe.calendarview.bean.DateBean;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
 
@@ -134,6 +135,16 @@ public class CalendarUtil {
      */
     public static int dateToPosition(int year, int month, int startY, int startM) {
         return (year - startY) * 12 + month - startM;
+    }
+
+    /**
+     * 计算当前日期
+     *
+     * @return
+     */
+    public static int[] getCurrentDate() {
+        Calendar calendar = Calendar.getInstance();
+        return new int[]{calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH) + 1, calendar.get(Calendar.DAY_OF_MONTH)};
     }
 
     public static int[] strToArray(String str) {

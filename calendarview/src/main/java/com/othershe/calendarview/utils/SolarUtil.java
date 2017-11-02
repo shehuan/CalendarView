@@ -163,14 +163,4 @@ public class SolarUtil {
         calendar.set(year, month, 1);
         return calendar.get(Calendar.DAY_OF_WEEK) - 1;
     }
-
-    /**
-     * 计算当前日期
-     *
-     * @return
-     */
-    public static int[] getCurrentDate() {
-        Calendar calendar = Calendar.getInstance();
-        return new int[]{calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH) + 1, calendar.get(Calendar.DAY_OF_MONTH)};
-    }
 }

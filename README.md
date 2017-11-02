@@ -97,6 +97,7 @@ calendarView.setOnItemClickListener(new OnMonthItemClickListener() {
 |lastYear()|跳转到上一年的当前月
 |toStart()|跳转到日历的开始年月
 |toEnd()|跳转到日历的结束年月
+|CalendarUtil.getCurrentDate()|获得当前日期（今天）
 
 ### CalendarView的自定义属性
 namespace：xmlns:calendarview="http://schemas.android.com/apk/res-auto"

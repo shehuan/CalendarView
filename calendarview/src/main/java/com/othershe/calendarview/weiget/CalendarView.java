@@ -14,7 +14,6 @@ import com.othershe.calendarview.listener.OnMultiChooseListener;
 import com.othershe.calendarview.listener.OnSingleChooseListener;
 import com.othershe.calendarview.listener.OnPagerChangeListener;
 import com.othershe.calendarview.utils.CalendarUtil;
-import com.othershe.calendarview.utils.SolarUtil;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -265,9 +264,9 @@ public class CalendarView extends ViewPager {
      * 单选时跳转到今天
      */
     public void today() {
-        int destPosition = CalendarUtil.dateToPosition(SolarUtil.getCurrentDate()[0], SolarUtil.getCurrentDate()[1], startDate[0], startDate[1]);
+        int destPosition = CalendarUtil.dateToPosition(CalendarUtil.getCurrentDate()[0], CalendarUtil.getCurrentDate()[1], startDate[0], startDate[1]);
         lastClickDate[0] = destPosition;
-        lastClickDate[1] = SolarUtil.getCurrentDate()[2];
+        lastClickDate[1] = CalendarUtil.getCurrentDate()[2];
         if (destPosition == currentPosition) {
             refreshMonthView(destPosition);
         } else {

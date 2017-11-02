@@ -41,15 +41,15 @@ public class MultiChooseActivity extends AppCompatActivity {
                 .setStartEndDate("2016.1", "2018.12")
                 .setDisableStartEndDate("2017.10.7", "2017.12.25")
                 .setInitDate("2017.11")
-//                .setMultiDate(list)
+                .setMultiDate(list)
                 .init();
 
         title.setText(2017 + "年" + 11 + "月");
 
         for (String d : list) {
-//            sb.append("选中：" + d + "\n");
+            sb.append("选中：" + d + "\n");
         }
-//        chooseDate.setText(sb.toString());
+        chooseDate.setText(sb.toString());
 
         calendarView.setOnMultiChooseListener(new OnMultiChooseListener() {
             @Override
