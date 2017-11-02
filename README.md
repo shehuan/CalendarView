@@ -11,8 +11,8 @@
 * 8、通过自定义属性定制日期外观，以及简单的日期item布局配置
 * 9、......
 
-#### [基本原理介绍](http://www.jianshu.com/p/304c8e70d0bd)    
-#### [demo下载](https://fir.im/vehj?release_id=59154975ca87a8790e00015b)
+#### [基本原理](http://www.jianshu.com/p/304c8e70d0bd)
+#### [demo体验](https://fir.im/vehj?release_id=59fabc7fca87a80715000620)
 
 ### 效果图：
 |![](screenshot/1.gif)|![](screenshot/2.gif)|![](screenshot/3.gif)|
