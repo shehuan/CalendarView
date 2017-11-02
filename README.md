@@ -73,7 +73,7 @@ calendarView.setOnItemClickListener(new OnMonthItemClickListener() {
         });
 
 ```
-### CalendarView相关方法：
+### CalendarView相关方法
 |方法名|描述
 |---|---|
 |setInitDate(String date)|设置日历的初始显示年月
