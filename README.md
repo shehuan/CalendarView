@@ -37,11 +37,11 @@ dependencies {
 ```
 **Step 3. 在布局文件中添加WeekView、CalendarView**
 ```java
-<com.othershe.calendarview.WeekView
+<com.othershe.calendarview.weiget.WeekView
         android:layout_width="match_parent"
         android:layout_height="35dp" />
         
-<com.othershe.calendarview.CalendarView
+<com.othershe.calendarview.weiget.CalendarView
         android:id="@+id/calendar"
         android:layout_width="match_parent"
         android:layout_height="220dp" />
