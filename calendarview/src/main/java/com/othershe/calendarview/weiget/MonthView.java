@@ -167,7 +167,6 @@ public class MonthView extends ViewGroup {
             //设置禁用日期
             if (date.getType() == 1) {
                 view.setTag(date.getSolar()[2]);
-                view.setTag(date.getSolar()[2]);
                 if (mAttrsBean.getDisableStartDate() != null
                         && (date.getSolar()[0] < mAttrsBean.getDisableStartDate()[0]
                         || (date.getSolar()[0] == mAttrsBean.getDisableStartDate()[0] && date.getSolar()[1] < mAttrsBean.getDisableStartDate()[1])
@@ -225,13 +224,17 @@ public class MonthView extends ViewGroup {
                             }
                         }
                     } else if (date.getType() == 0) {//点击上月
-                        calendarView.setLastClickDay(day);
+                        if (mAttrsBean.isSwitchChoose()) {
+                            calendarView.setLastClickDay(day);
+                        }
                         calendarView.lastMonth();
                         if (clickListener != null) {
                             clickListener.onSingleChoose(v, date);
                         }
                     } else if (date.getType() == 2) {//点击下月
-                        calendarView.setLastClickDay(day);
+                        if (mAttrsBean.isSwitchChoose()) {
+                            calendarView.setLastClickDay(day);
+                        }
                         calendarView.nextMonth();
                         if (clickListener != null) {
                             clickListener.onSingleChoose(v, date);

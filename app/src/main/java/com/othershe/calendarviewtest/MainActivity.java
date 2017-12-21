@@ -52,21 +52,19 @@ public class MainActivity extends AppCompatActivity {
 //            }
 //        }).init();
 
-        DateBean d = calendarView.getSingleDate();
-
-        title.setText(d.getSolar()[0] + "年" + d.getSolar()[1] + "月" + d.getSolar()[2] + "日");
+        title.setText("2017年11月");
 
         calendarView.setOnPagerChangeListener(new OnPagerChangeListener() {
             @Override
             public void onPagerChanged(int[] date) {
-                title.setText(date[0] + "年" + date[1] + "月" + date[2] + "日");
+                title.setText(date[0] + "年" + date[1] + "月");
             }
         });
 
         calendarView.setOnSingleChooseListener(new OnSingleChooseListener() {
             @Override
             public void onSingleChoose(View view, DateBean date) {
-                title.setText(date.getSolar()[0] + "年" + date.getSolar()[1] + "月" + date.getSolar()[2] + "日");
+                title.setText(date.getSolar()[0] + "年" + date.getSolar()[1] + "月");
             }
         });
     }
