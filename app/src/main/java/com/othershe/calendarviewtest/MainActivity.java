@@ -15,6 +15,7 @@ import android.widget.Toast;
 import com.othershe.calendarview.bean.DateBean;
 import com.othershe.calendarview.listener.OnSingleChooseListener;
 import com.othershe.calendarview.listener.OnPagerChangeListener;
+import com.othershe.calendarview.utils.CalendarUtil;
 import com.othershe.calendarview.weiget.CalendarView;
 
 import java.util.HashMap;
@@ -22,12 +23,16 @@ import java.util.HashMap;
 public class MainActivity extends AppCompatActivity {
 
     private CalendarView calendarView;
+    TextView chooseDate;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         final TextView title = (TextView) findViewById(R.id.title);
+        //当前选中的日期
+        chooseDate = findViewById(R.id.choose_date);
+
         calendarView = (CalendarView) findViewById(R.id.calendar);
         HashMap<String, String> map = new HashMap<>();
         map.put("2017.10.30", "qaz");
@@ -38,7 +43,7 @@ public class MainActivity extends AppCompatActivity {
         map.put("2017.11.11", "tgb");
         calendarView
 //                .setSpecifyMap(map)
-                .setStartEndDate("2010.7", "2018.12")
+                .setStartEndDate("2010.7", "2019.12")
                 .setInitDate("2017.11")
                 .setSingleDate("2017.12.12")
                 .init();
@@ -53,6 +58,7 @@ public class MainActivity extends AppCompatActivity {
 //        }).init();
 
         title.setText("2017年11月");
+        chooseDate.setText("当前选中的日期：2017年12月12日");
 
         calendarView.setOnPagerChangeListener(new OnPagerChangeListener() {
             @Override
@@ -65,6 +71,9 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onSingleChoose(View view, DateBean date) {
                 title.setText(date.getSolar()[0] + "年" + date.getSolar()[1] + "月");
+                if (date.getType() == 1) {
+                    chooseDate.setText("当前选中的日期：" + date.getSolar()[0] + "年" + date.getSolar()[1] + "月" + date.getSolar()[2] + "日");
+                }
             }
         });
     }
@@ -86,6 +95,7 @@ public class MainActivity extends AppCompatActivity {
                             Toast.makeText(MainActivity.this, "请完善日期！", Toast.LENGTH_SHORT).show();
                             return;
                         }
+                        chooseDate.setText("当前选中的日期：" + year.getText() + "年" + month.getText() + "月" + day.getText() + "日");
                         calendarView.toSpecifyDate(Integer.valueOf(year.getText().toString()),
                                 Integer.valueOf(month.getText().toString()),
                                 Integer.valueOf(day.getText().toString()));
@@ -97,6 +107,8 @@ public class MainActivity extends AppCompatActivity {
 
     public void today(View view) {
         calendarView.today();
+        int[] date = CalendarUtil.getCurrentDate();
+        chooseDate.setText("当前选中的日期：" + date[0] + "年" + date[1] + "月" + date[2] + "日");
     }
 
     public void lastMonth(View view) {

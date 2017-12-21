@@ -220,7 +220,7 @@ public class LunarUtil {
      */
     private static int getLeapMonthDays(int year) {
         if (getLeapMonth(year) != 0) {
-            if ((LUNAR_INFO[year - 1900] & 0xf0000) == 0) {
+            if ((LUNAR_INFO[year - MIN_YEAR] & 0xf0000) == 0) {
                 return 29;
             } else {
                 return 30;
@@ -309,7 +309,7 @@ public class LunarUtil {
     }
 
     public static int daysInLunarMonth(int year, int month) {
-        if ((LUNAR_INFO[year - MIN_YEAR] & (0x100000 >> month)) == 0)
+        if ((LUNAR_INFO[year - MIN_YEAR] & (0x10000 >> month)) == 0)
             return 29;
         else
             return 30;
