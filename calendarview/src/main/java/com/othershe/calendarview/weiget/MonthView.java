@@ -339,6 +339,9 @@ public class MonthView extends ViewGroup {
             return;
         }
         View destView = findDestView(day);
+        if (destView == null) {
+            return;
+        }
         setDayColor(destView, COLOR_SET);
         lastClickedView = destView;
         invalidate();

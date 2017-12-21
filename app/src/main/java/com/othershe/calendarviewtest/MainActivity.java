@@ -23,7 +23,9 @@ import java.util.HashMap;
 public class MainActivity extends AppCompatActivity {
 
     private CalendarView calendarView;
-    TextView chooseDate;
+    private TextView chooseDate;
+
+    private int[] cDate = CalendarUtil.getCurrentDate();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,9 +45,10 @@ public class MainActivity extends AppCompatActivity {
         map.put("2017.11.11", "tgb");
         calendarView
 //                .setSpecifyMap(map)
-                .setStartEndDate("2010.7", "2019.12")
-                .setInitDate("2017.11")
-                .setSingleDate("2017.12.12")
+                .setStartEndDate("2014.1", "2030.12")
+                .setDisableStartEndDate("2014.7.10", "2018.9.12")
+                .setInitDate(cDate[0] + "." + cDate[1])
+                .setSingleDate("2018.9.17")
                 .init();
 
 //       .setOnCalendarViewAdapter(R.layout.item_layout, new CalendarViewAdapter() {
@@ -57,8 +60,8 @@ public class MainActivity extends AppCompatActivity {
 //            }
 //        }).init();
 
-        title.setText("2017年11月");
-        chooseDate.setText("当前选中的日期：2017年12月12日");
+        title.setText(cDate[0] + "年" + cDate[1] + "月");
+        chooseDate.setText("当前选中的日期：" + cDate[0] + "年" + cDate[1] + "月" + cDate[2] + "日");
 
         calendarView.setOnPagerChangeListener(new OnPagerChangeListener() {
             @Override
@@ -107,8 +110,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void today(View view) {
         calendarView.today();
-        int[] date = CalendarUtil.getCurrentDate();
-        chooseDate.setText("当前选中的日期：" + date[0] + "年" + date[1] + "月" + date[2] + "日");
+        chooseDate.setText("当前选中的日期：" + cDate[0] + "年" + cDate[1] + "月" + cDate[2] + "日");
     }
 
     public void lastMonth(View view) {

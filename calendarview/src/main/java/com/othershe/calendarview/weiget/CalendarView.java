@@ -213,6 +213,11 @@ public class CalendarView extends ViewPager {
         }
     }
 
+    private void checkDate(){
+        int[] disableStart = mAttrsBean.getDisableStartDate();
+        int[] disableEnd = mAttrsBean.getDisableEndDate();
+    }
+
     /**
      * 设置日期单选回调
      *
