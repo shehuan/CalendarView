@@ -159,6 +159,13 @@ public class CalendarUtil {
         return null;
     }
 
+    public static long dateToMillis(int[] date) {
+        int day = date.length == 2 ? 1 : date[2];
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(date[0], date[1], day);
+        return calendar.getTimeInMillis();
+    }
+
     public static int getPxSize(Context context, int size) {
         return size * context.getResources().getDisplayMetrics().densityDpi;
     }

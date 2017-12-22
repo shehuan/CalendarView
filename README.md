@@ -12,7 +12,7 @@
 * 9、......
 
 #### [基本原理](http://www.jianshu.com/p/304c8e70d0bd)
-#### [demo体验](https://fir.im/vehj?release_id=5a3b59f3959d691cc2000583)
+#### [demo体验](https://fir.im/vehj?release_id=5a3c76cc959d695b3800035b)
 
 ### 效果图：
 |![](screenshot/1.gif)|![](screenshot/2.gif)|![](screenshot/3.gif)|
@@ -32,7 +32,7 @@ allprojects {
 **Step 2. 添加项目依赖**
 ``` gradle
 dependencies {
-        compile 'com.github.Othershe:CalendarView:1.2.0'
+        compile 'com.github.Othershe:CalendarView:1.2.1'
 }
 ```
 **Step 3. 在布局文件中添加WeekView、CalendarView**
@@ -49,7 +49,7 @@ dependencies {
 **Step 4. 相关初始化**
 ```java
 CalendarView calendarView = (CalendarView) findViewById(R.id.calendar);
-//日历init
+//日历init，年月日之间用点号隔开
 calendarView
         .setStartEndDate("2010.7", "2018.12")
         .setInitDate("2017.11")

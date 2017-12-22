@@ -15,6 +15,7 @@ import com.othershe.calendarview.bean.DateBean;
 import com.othershe.calendarview.listener.CalendarViewAdapter;
 import com.othershe.calendarview.listener.OnMultiChooseListener;
 import com.othershe.calendarview.listener.OnSingleChooseListener;
+import com.othershe.calendarview.utils.CalendarUtil;
 
 import java.util.HashSet;
 import java.util.List;
@@ -168,9 +169,7 @@ public class MonthView extends ViewGroup {
             if (date.getType() == 1) {
                 view.setTag(date.getSolar()[2]);
                 if (mAttrsBean.getDisableStartDate() != null
-                        && (date.getSolar()[0] < mAttrsBean.getDisableStartDate()[0]
-                        || (date.getSolar()[0] == mAttrsBean.getDisableStartDate()[0] && date.getSolar()[1] < mAttrsBean.getDisableStartDate()[1])
-                        || (date.getSolar()[0] == mAttrsBean.getDisableStartDate()[0] && date.getSolar()[1] == mAttrsBean.getDisableStartDate()[1] && date.getSolar()[2] < mAttrsBean.getDisableStartDate()[2]))) {
+                        && (CalendarUtil.dateToMillis(mAttrsBean.getDisableStartDate()) > CalendarUtil.dateToMillis(date.getSolar()))) {
                     solarDay.setTextColor(mAttrsBean.getColorLunar());
                     lunarDay.setTextColor(mAttrsBean.getColorLunar());
                     view.setTag(-1);
@@ -179,9 +178,7 @@ public class MonthView extends ViewGroup {
                 }
 
                 if (mAttrsBean.getDisableEndDate() != null
-                        && (date.getSolar()[0] > mAttrsBean.getDisableEndDate()[0]
-                        || (date.getSolar()[0] == mAttrsBean.getDisableEndDate()[0] && date.getSolar()[1] > mAttrsBean.getDisableEndDate()[1])
-                        || (date.getSolar()[0] == mAttrsBean.getDisableEndDate()[0] && date.getSolar()[1] == mAttrsBean.getDisableEndDate()[1] && date.getSolar()[2] > mAttrsBean.getDisableEndDate()[2]))) {
+                        && (CalendarUtil.dateToMillis(mAttrsBean.getDisableEndDate()) < CalendarUtil.dateToMillis(date.getSolar()))) {
                     solarDay.setTextColor(mAttrsBean.getColorLunar());
                     lunarDay.setTextColor(mAttrsBean.getColorLunar());
                     view.setTag(-1);

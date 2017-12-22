@@ -45,10 +45,10 @@ public class MainActivity extends AppCompatActivity {
         map.put("2017.11.11", "tgb");
         calendarView
 //                .setSpecifyMap(map)
-                .setStartEndDate("2014.1", "2030.12")
-                .setDisableStartEndDate("2014.7.10", "2018.9.12")
+                .setStartEndDate("2016.1", "2028.12")
+                .setDisableStartEndDate("2016.10.10", "2028.10.10")
                 .setInitDate(cDate[0] + "." + cDate[1])
-                .setSingleDate("2018.9.17")
+                .setSingleDate(cDate[0] + "." + cDate[1] + "." + cDate[2])
                 .init();
 
 //       .setOnCalendarViewAdapter(R.layout.item_layout, new CalendarViewAdapter() {
@@ -98,10 +98,14 @@ public class MainActivity extends AppCompatActivity {
                             Toast.makeText(MainActivity.this, "请完善日期！", Toast.LENGTH_SHORT).show();
                             return;
                         }
-                        chooseDate.setText("当前选中的日期：" + year.getText() + "年" + month.getText() + "月" + day.getText() + "日");
-                        calendarView.toSpecifyDate(Integer.valueOf(year.getText().toString()),
+                        boolean result = calendarView.toSpecifyDate(Integer.valueOf(year.getText().toString()),
                                 Integer.valueOf(month.getText().toString()),
                                 Integer.valueOf(day.getText().toString()));
+                        if (!result) {
+                            Toast.makeText(MainActivity.this, "日期越界！", Toast.LENGTH_SHORT).show();
+                        } else {
+                            chooseDate.setText("当前选中的日期：" + year.getText() + "年" + month.getText() + "月" + day.getText() + "日");
+                        }
                         dialog.dismiss();
                     }
                 })

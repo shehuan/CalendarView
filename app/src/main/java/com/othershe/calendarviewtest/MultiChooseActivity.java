@@ -33,13 +33,13 @@ public class MultiChooseActivity extends AppCompatActivity {
         List<String> list = new ArrayList<>();
         list.add("2017.11.11");
         list.add("2017.11.12");
-        list.add("2017.11.22");
-        list.add("2017.12.12");
+        list.add("2017.12.22");
+        list.add("2017.12.25");
 
         calendarView = (CalendarView) findViewById(R.id.calendar);
         calendarView
-                .setStartEndDate("2016.1", "2018.12")
-                .setDisableStartEndDate("2017.10.7", "2017.12.25")
+                .setStartEndDate("2017.1", "2019.12")
+                .setDisableStartEndDate("2017.10.7", "2019.10.7")
                 .setInitDate("2017.11")
                 .setMultiDate(list)
                 .init();
