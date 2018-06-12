@@ -9,6 +9,9 @@
         <attr name="show_holiday" format="boolean" />
         <!--是否显示节气-->
         <attr name="show_term" format="boolean" />
+         <!--是否可以点击-->
+         <attr name="show_enable" format="boolean" />
+        
         <!--阳历的日期颜色-->
         <attr name="solar_color" format="color" />
         <!--阳历的日期尺寸-->
