@@ -49,7 +49,7 @@ public class MonthView extends ViewGroup {
         super(context, attrs, 0);
 
         mContext = context;
-        setBackgroundColor(Color.WHITE);
+        setBackgroundColor(Color.TRANSPARENT);
     }
 
     /**
